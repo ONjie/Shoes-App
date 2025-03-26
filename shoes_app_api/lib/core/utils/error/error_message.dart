@@ -1,0 +1,11 @@
+const fetchLatestShoesErrorMessage = 'No latest shoes found';
+const fetchLatestShoesByBrandErrorMessage = 'No latest shoes found from such brand';
+const fetchOtherShoesErrorMessage = 'No other shoes found';
+const fetchOtherShoesByBrandErrorMessage = 'No other shoes found from such brand';
+const fetchPopularShoesErrorMessage = 'No popular shoes found';
+const fetchPopularShoesByBrandErrorMessage = 'No popular shoes found from such brand';
+const fetchShoesErrorMessage = 'No shoes data found';
+const fetchShoesByBrandErrorMessage = 'No shoes data found from such brand';
+const fetchShoesByCategoryErrorMessage = 'No shoes data found from such category';
+const fetchShoesSuggestionsErrorMessage = 'No shoes found';
+const supabaseDatabaseError = 'Supabase database error';

@@ -1,0 +1,32 @@
+{
+    "shoes_data": [
+        {
+            "id": 1,
+            "title": "Title",
+            "description": "Description",
+            "images": ["image1", "image2", "image3"],
+            "price": 100,
+            "brand": "Shoe",
+            "colors": ["color1", "color2", "color3"],
+            "sizes": [1,2,3,4,5],
+            "isPopular": true,
+            "isNew": true,
+            "category": "Men",
+            "ratings": 1.5
+          },
+          {
+            "id": 1,
+            "title": "Title",
+            "description": "Description",
+            "images": ["image1", "image2", "image3"],
+            "price": 100,
+            "brand": "Shoe",
+            "colors": ["color1", "color2", "color3"],
+            "sizes": [1,2,3,4,5],
+            "isPopular": true,
+            "isNew": true,
+            "category": "Men",
+            "ratings": 1.5
+          }
+    ]
+}
