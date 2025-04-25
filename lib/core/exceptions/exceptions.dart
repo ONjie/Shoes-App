@@ -22,3 +22,9 @@ class StripePaymentException implements Exception{
 
   StripePaymentException({required this.message});
 }
+
+class SupabaseAuthException implements Exception{
+  final String message;
+
+  SupabaseAuthException({required this.message});
+}
