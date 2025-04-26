@@ -1,0 +1,15 @@
+import 'package:either_dart/either.dart';
+
+import '../../../../core/core.dart';
+import '../entities/shoe_entity.dart';
+import '../repositories/shoes_repository.dart';
+
+class FetchShoesSuggestions {
+  final ShoesRepository shoesRepository;
+
+  FetchShoesSuggestions({required this.shoesRepository});
+
+  Future<Either<Failure, List<ShoeEntity>>> call({
+    required String shoeTitle,
+  }) async => await shoesRepository.fetchShoesSuggestions(shoeTitle: shoeTitle);
+}
