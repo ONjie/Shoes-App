@@ -15,7 +15,8 @@ abstract class SupabaseDatabase {
 
   Future<ShoeList> fetchShoesByBrand({required String brand});
 
-  Future<ShoeList> fetchShoesByCategory({required String category});
+  Future<ShoeList> fetchShoesByCategoryAndBrand(
+      {required String category, required String brand,});
 
   Future<ShoeList> fetchLatestShoes();
 
@@ -34,7 +35,7 @@ class SupabaseDatabaseImpl implements SupabaseDatabase {
   SupabaseDatabaseImpl({required this.supabaseClient});
   final SupabaseClient supabaseClient;
 
-  Future<ShoeList> _fecthShoesData() async {
+  Future<ShoeList> _fetchShoesData() async {
     try {
       final results =
           await supabaseClient.from('shoes').select('shoes_data').single();
@@ -51,7 +52,7 @@ class SupabaseDatabaseImpl implements SupabaseDatabase {
     required bool Function(Shoe) filter,
     required String errorMessage,
   }) async {
-    final shoes = await _fecthShoesData();
+    final shoes = await _fetchShoesData();
 
     final filteredShoes = shoes.where(filter).toList();
 
@@ -77,8 +78,8 @@ class SupabaseDatabaseImpl implements SupabaseDatabase {
     );
   }
 
-   @override
-  Future<ShoeList> fetchOtherShoes() async{
+  @override
+  Future<ShoeList> fetchOtherShoes() async {
     return _filterShoes(
       filter: (shoe) => !shoe.isPopular && !shoe.isNew,
       errorMessage: fetchOtherShoesErrorMessage,
@@ -112,7 +113,7 @@ class SupabaseDatabaseImpl implements SupabaseDatabase {
   @override
   Future<Shoe> fetchShoeById({required int id}) async {
     try {
-      final shoes = await _fecthShoesData();
+      final shoes = await _fetchShoesData();
 
       return shoes.firstWhere((shoe) => shoe.id == id);
     } catch (e) {
@@ -122,7 +123,7 @@ class SupabaseDatabaseImpl implements SupabaseDatabase {
 
   @override
   Future<List<Shoe>> fetchShoes() async {
-    return _fecthShoesData();
+    return _fetchShoesData();
   }
 
   @override
@@ -134,9 +135,12 @@ class SupabaseDatabaseImpl implements SupabaseDatabase {
   }
 
   @override
-  Future<ShoeList> fetchShoesByCategory({required String category}) async {
+  Future<ShoeList> fetchShoesByCategoryAndBrand({
+    required String category,
+    required String brand,
+  }) async {
     return _filterShoes(
-      filter: (shoe) => shoe.category == category,
+      filter: (shoe) => shoe.category == category && shoe.brand == brand,
       errorMessage: fetchShoesByCategoryErrorMessage,
     );
   }

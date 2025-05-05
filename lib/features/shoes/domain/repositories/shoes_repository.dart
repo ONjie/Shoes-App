@@ -31,6 +31,7 @@ abstract class ShoesRepository {
 
   Future<FailureOrShoeEntityList> fetchShoesByCategory({
     required String category,
+    required String brand,
   });
 
   Future<Either<Failure, ShoeEntity>> fetchShoe({required int shoeId});

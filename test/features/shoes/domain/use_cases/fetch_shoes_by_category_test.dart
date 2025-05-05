@@ -35,8 +35,8 @@ void main() {
     isFavorite: false,
   );
 
-  const tCategory = 'Men';
-
+  const tCategory = 'category';
+  const tBrand = 'brand';
   final tShoeEntityList = [tShoeEntity];
 
   test('should return Right(List<ShoeEntity>) from ShoesRepository', () async {
@@ -44,17 +44,19 @@ void main() {
     when(
       () => mockShoesRepository.fetchShoesByCategory(
         category: any(named: 'category'),
+        brand: any(named: 'brand')
       ),
     ).thenAnswer((_) async => Right(tShoeEntityList));
 
     //act
-    final result = await fetchShoesByCategory.call(category: tCategory);
+    final result = await fetchShoesByCategory.call(category: tCategory, brand: tBrand);
 
     //assert
     expect(result, Right(tShoeEntityList));
     verify(
       () => mockShoesRepository.fetchShoesByCategory(
         category: any(named: 'category'),
+        brand: any(named: 'brand')
       ),
     ).called(1);
     verifyNoMoreInteractions(mockShoesRepository);

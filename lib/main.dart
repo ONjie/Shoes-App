@@ -5,6 +5,7 @@ import 'package:shoes_app/core/route/route_config.dart';
 import 'package:shoes_app/core/utils/theme/theme.dart';
 import 'package:shoes_app/features/authentication/presentation/bloc/authentication_bloc.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'features/shoes/presentation/bloc/shoes_bloc.dart';
 import 'injection_container.dart' as di;
 
 void main() async {
@@ -21,7 +22,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (context) => di.locator<AuthenticationBloc>())
+        BlocProvider(create: (context) => di.locator<AuthenticationBloc>()),
+        BlocProvider(create: (context) => di.locator<ShoesBloc>())
       ],
       child: MaterialApp.router(
         routerConfig: router,

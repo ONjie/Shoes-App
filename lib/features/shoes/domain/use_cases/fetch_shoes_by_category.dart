@@ -10,7 +10,7 @@ class FetchShoesByCategory{
 
   FetchShoesByCategory({required this.shoesRepository});
 
-  Future<Either<Failure, List<ShoeEntity>>> call({required String category})
-  async => await shoesRepository.fetchShoesByCategory(category: category);
+  Future<Either<Failure, List<ShoeEntity>>> call({required String category, required String brand})
+  async => await shoesRepository.fetchShoesByCategory(category: category, brand: brand);
 
 }

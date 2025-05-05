@@ -51,7 +51,7 @@ class _SplashScreenState extends State<SplashScreen> {
         listener: (context, state) {
           if (state.authenticationStatus ==
               AuthenticationStatus.authenticated) {
-            context.go('/home');
+            context.go('/home/0');
           }
           if (state.authenticationStatus ==
               AuthenticationStatus.unauthenticated) {

@@ -50,6 +50,9 @@ void main() {
       ratings: 1.5,
     );
 
+    const tCategory = 'category';
+    const tBrand = 'brand';
+
     test(
         'should HttpStatus.badRequest and an error message when category is not provided',
         () async {
@@ -57,9 +60,7 @@ void main() {
       when(() => mockRequest.method).thenReturn(HttpMethod.get);
       when(() => mockRequest.uri).thenReturn(
         Uri(
-          queryParameters: {
-            'category': '',
-          },
+          queryParameters: {'category': '', 'brand': tBrand},
         ),
       );
 
@@ -70,7 +71,7 @@ void main() {
 
       //assert
       expect(response.statusCode, equals(HttpStatus.badRequest));
-      expect(body['error'], equals('category is required'));
+      expect(body['error'], equals('Both category and brand are required'));
 
       verify(() => mockRequest.method).called(1);
       verify(() => mockRequest.uri).called(1);
@@ -86,14 +87,13 @@ void main() {
       when(() => mockRequest.method).thenReturn(HttpMethod.get);
       when(() => mockRequest.uri).thenReturn(
         Uri(
-          queryParameters: {
-            'category': tShoe.category,
-          },
+          queryParameters: {'category': tCategory, 'brand': tBrand},
         ),
       );
       when(
-        () => mockShoesRepository.fetchShoesByCategory(
+        () => mockShoesRepository.fetchShoesByCategoryAndBrand(
           category: any(named: 'category'),
+          brand: any(named: 'brand'),
         ),
       ).thenAnswer(
         (_) async => const Left(
@@ -115,8 +115,9 @@ void main() {
       verify(() => mockRequestContext.request).called(2);
       verify(() => mockRequestContext.read<ShoesRepository>()).called(1);
       verify(
-        () => mockShoesRepository.fetchShoesByCategory(
+        () => mockShoesRepository.fetchShoesByCategoryAndBrand(
           category: any(named: 'category'),
+          brand: any(named: 'brand'),
         ),
       ).called(1);
 
@@ -131,13 +132,15 @@ void main() {
       when(() => mockRequest.method).thenReturn(HttpMethod.get);
       when(() => mockRequest.uri).thenReturn(
         Uri(
-          queryParameters: {
-            'category': tShoe.category,
-          },
+          queryParameters: {'category': tCategory, 'brand': tBrand},
         ),
       );
-      when(() => mockShoesRepository.fetchShoesByCategory(category: any(named: 'category')))
-          .thenAnswer(
+      when(
+        () => mockShoesRepository.fetchShoesByCategoryAndBrand(
+          category: any(named: 'category'),
+          brand: any(named: 'brand'),
+        ),
+      ).thenAnswer(
         (_) async => const Right([tShoe]),
       );
 
@@ -154,8 +157,12 @@ void main() {
       verify(() => mockRequest.uri).called(1);
       verify(() => mockRequestContext.request).called(2);
       verify(() => mockRequestContext.read<ShoesRepository>()).called(1);
-      verify(() => mockShoesRepository.fetchShoesByCategory(category: any(named: 'category')))
-          .called(1);
+      verify(
+        () => mockShoesRepository.fetchShoesByCategoryAndBrand(
+          category: any(named: 'category'),
+          brand: any(named: 'brand'),
+        ),
+      ).called(1);
 
       verifyNoMoreInteractions(mockRequestContext);
       verifyNoMoreInteractions(mockShoesRepository);

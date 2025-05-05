@@ -1,7 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shoes_app/core/core.dart';
-import 'package:shoes_app/core/failures/failures.dart';
 import 'package:shoes_app/features/authentication/domain/use_cases/check_auth_state.dart';
 import 'package:shoes_app/features/authentication/domain/use_cases/reset_password.dart';
 import 'package:shoes_app/features/authentication/domain/use_cases/send_reset_password_otp.dart';
@@ -58,7 +57,7 @@ class AuthenticationBloc
         emit(
           AuthenticationState(
             authenticationStatus: AuthenticationStatus.signInError,
-            message: _mapFailureToMessage(failure: failure),
+            message: mapFailureToMessage(failure: failure),
           ),
         );
       },
@@ -116,7 +115,7 @@ class AuthenticationBloc
         emit(
           AuthenticationState(
             authenticationStatus: AuthenticationStatus.signOutError,
-            message: _mapFailureToMessage(failure: failure),
+            message: mapFailureToMessage(failure: failure),
           ),
         );
       },
@@ -148,7 +147,7 @@ class AuthenticationBloc
         emit(
           AuthenticationState(
             authenticationStatus: AuthenticationStatus.signUpError,
-            message: _mapFailureToMessage(failure: failure),
+            message: mapFailureToMessage(failure: failure),
           ),
         );
       },
@@ -181,7 +180,7 @@ class AuthenticationBloc
         emit(
           AuthenticationState(
             authenticationStatus: AuthenticationStatus.resetPasswordOTPError,
-            message: _mapFailureToMessage(failure: failure),
+            message: mapFailureToMessage(failure: failure),
           ),
         );
       },
@@ -217,7 +216,7 @@ class AuthenticationBloc
         emit(
           AuthenticationState(
             authenticationStatus: AuthenticationStatus.resetPasswordError,
-            message: _mapFailureToMessage(failure: failure),
+            message: mapFailureToMessage(failure: failure),
           ),
         );
       },
@@ -231,15 +230,4 @@ class AuthenticationBloc
     );
   }
 
-  String _mapFailureToMessage({required Failure failure}) {
-    if (failure is SupabaseAuthFailure) {
-      return failure.message;
-    } else if (failure is InternetConnectionFailure) {
-      return failure.message;
-    } else if (failure is OtherFailure) {
-      return failure.message;
-    } else {
-      return 'Unexpected Error';
-    }
-  }
 }

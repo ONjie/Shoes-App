@@ -18,6 +18,12 @@ ThemeData appTheme = ThemeData(
       fontWeight: FontWeight.w600,
       fontFamily: 'Caladea',
     ),
+    titleMedium: TextStyle(
+      color: Color(0xFFFFFFFF),
+      fontSize: 20,
+      fontWeight: FontWeight.w600,
+      fontFamily: 'Caladea',
+    ),
     bodyLarge: TextStyle(
       color: Color(0xFF111111),
       fontSize: 20,
@@ -26,20 +32,20 @@ ThemeData appTheme = ThemeData(
     ),
     bodyMedium: TextStyle(
       color: Color(0xFF111111),
-      fontSize: 18,
+      fontSize: 20,
       fontWeight: FontWeight.w500,
       fontFamily: 'Caladea',
     ),
     bodySmall: TextStyle(
       color: Color(0xFF111111),
-      fontSize: 16,
-      fontWeight: FontWeight.w400,
+      fontSize: 18,
+      fontWeight: FontWeight.w500,
       fontFamily: 'Caladea',
     ),
     labelLarge: TextStyle(
       color: Color(0xFF111111),
-      fontSize: 16,
-      fontWeight: FontWeight.w500,
+      fontSize: 20,
+      fontWeight: FontWeight.w700,
       fontFamily: 'Caladea',
     ),
     labelMedium: TextStyle(

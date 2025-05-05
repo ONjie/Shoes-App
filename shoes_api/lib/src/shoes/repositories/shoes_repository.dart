@@ -18,8 +18,9 @@ abstract class ShoesRepository {
 
   Future<EitherShoeListOrFailure> fetchShoesByBrand({required String brand});
 
-  Future<EitherShoeListOrFailure> fetchShoesByCategory({
+  Future<EitherShoeListOrFailure> fetchShoesByCategoryAndBrand({
     required String category,
+    required String brand,
   });
 
   Future<EitherShoeListOrFailure> fetchLatestShoes();
@@ -113,7 +114,7 @@ class ShoesRepositoryImpl implements ShoesRepository {
     } on SupabaseException catch (e) {
       return Left(SupabaseFailure(message: e.message));
     } on OtherException catch (e) {
-      return Left(OtherFailure(message: e.message)) ;
+      return Left(OtherFailure(message: e.message));
     }
   }
 
@@ -123,23 +124,26 @@ class ShoesRepositoryImpl implements ShoesRepository {
   }
 
   @override
-  Future<EitherShoeListOrFailure> fetchShoesByBrand({required String brand}) async {
+  Future<EitherShoeListOrFailure> fetchShoesByBrand(
+      {required String brand,}) async {
     return _fetchShoes(
       fetchFunction: () => supabaseDatabase.fetchShoesByBrand(brand: brand),
     );
   }
 
   @override
-  Future<EitherShoeListOrFailure> fetchShoesByCategory(
-      {required String category,}) async {
+  Future<EitherShoeListOrFailure> fetchShoesByCategoryAndBrand(
+      {required String category, required String brand,}) async {
     return _fetchShoes(
-      fetchFunction: () => supabaseDatabase.fetchShoesByCategory(category: category),
+      fetchFunction: () =>
+          supabaseDatabase.fetchShoesByCategoryAndBrand(category: category, brand: brand),
     );
   }
 
   @override
-  Future<EitherShoeListOrFailure> fetchShoesSuggestions(
-      {required String title,}) async {
+  Future<EitherShoeListOrFailure> fetchShoesSuggestions({
+    required String title,
+  }) async {
     return _fetchShoes(
       fetchFunction: () => supabaseDatabase.fetchShoesSuggestions(title: title),
     );

@@ -6,6 +6,6 @@ const fetchPopularShoesErrorMessage = 'No popular shoes found';
 const fetchPopularShoesByBrandErrorMessage = 'No popular shoes found from such brand';
 const fetchShoesErrorMessage = 'No shoes data found';
 const fetchShoesByBrandErrorMessage = 'No shoes data found from such brand';
-const fetchShoesByCategoryErrorMessage = 'No shoes data found from such category';
+const fetchShoesByCategoryErrorMessage = 'No shoes found from this brand for this category';
 const fetchShoesSuggestionsErrorMessage = 'No shoes found';
 const supabaseDatabaseError = 'Supabase database error';
