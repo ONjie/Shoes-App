@@ -21,9 +21,9 @@ class ShoesBloc extends Bloc<ShoesEvent, ShoesState> {
   final FetchShoesByBrand fetchShoesByBrand;
   final FetchShoesByCategory fetchShoesByCategory;
   final FetchShoe fetchShoe;
-  // final FetchFavoriteShoes fetchFavoriteShoes;
-  // final AddShoeToFavoriteShoes addShoeToFavoriteShoes;
-  // final DeleteShoeFromFavoriteShoes deleteShoeFromFavoriteShoes;
+  final FetchFavoriteShoes fetchFavoriteShoes;
+  final AddShoeToFavoriteShoes addShoeToFavoriteShoes;
+  final DeleteShoeFromFavoriteShoes deleteShoeFromFavoriteShoes;
   ShoesBloc({
     required this.fetchLatestShoes,
     required this.fetchPopularShoes,
@@ -35,15 +35,18 @@ class ShoesBloc extends Bloc<ShoesEvent, ShoesState> {
     required this.fetchShoesByBrand,
     required this.fetchShoesByCategory,
     required this.fetchShoe,
-    // required this.fetchFavoriteShoes,
-    // required this.addShoeToFavoriteShoes,
-    //required this.deleteShoeFromFavoriteShoes,
+    required this.fetchFavoriteShoes,
+    required this.addShoeToFavoriteShoes,
+    required this.deleteShoeFromFavoriteShoes,
   }) : super(const ShoesState(shoesStatus: ShoesStatus.initial)) {
     on<FetchShoesByBrandWithFilterEvent>(_onFetchShoesByBrandWithFilter);
     on<FetchSearchedShoesEvent>(_onFetchSearchedShoes);
     on<FetchShoesByBrandEvent>(_onFetchShoesByBrand);
     on<FetchShoesByCategoryEvent>(_onFetchShoesByCategory);
     on<FetchShoeEvent>(_onFetchShoe);
+    on<FetchFavoriteShoesEvent>(_onFetchFavoriteShoes);
+    on<AddShoeToFavoriteShoesEvent>(_onAddShoeToFavoriteShoes);
+    on<DeleteShoeFromFavoriteShoesEvent>(_onDeleteShoeFromFavoriteShoes);
   }
 
   _onFetchShoesByBrandWithFilter(
@@ -196,4 +199,58 @@ class ShoesBloc extends Bloc<ShoesEvent, ShoesState> {
       },
     );
   }
-}
+
+  _onFetchFavoriteShoes(FetchFavoriteShoesEvent event, Emitter<ShoesState> emit) async {
+    emit(const ShoesState(shoesStatus: ShoesStatus.loading));
+
+    final favoriteShoesOrFailure = await fetchFavoriteShoes.call();
+
+    favoriteShoesOrFailure.fold(
+            (failure) {
+              emit(ShoesState(
+                  shoesStatus: ShoesStatus.fetchFavoriteShoesError,
+                  errorMessage: mapFailureToMessage(failure: failure,),
+                ),
+              );
+            },
+            (favoriteShoes) {
+              emit(ShoesState(
+                  shoesStatus: ShoesStatus.favoriteShoesFetched,
+                  favoriteShoes: favoriteShoes,),);
+            }
+    );
+  }
+
+  _onAddShoeToFavoriteShoes(AddShoeToFavoriteShoesEvent event, Emitter<ShoesState> emit)async{
+
+    final favoriteShoeOrFailure = await addShoeToFavoriteShoes.call(shoe: event.shoe);
+
+    favoriteShoeOrFailure.fold(
+            (failure) {
+              emit(ShoesState(
+                  shoesStatus: ShoesStatus.addShoeToFavoriteShoesError,
+                  errorMessage: mapFailureToMessage(failure: failure,),
+              ),);
+            },
+            (right) => null,
+    );
+  }
+
+  _onDeleteShoeFromFavoriteShoes(DeleteShoeFromFavoriteShoesEvent event, Emitter<ShoesState> emit) async {
+
+    final trueOrFailure = await deleteShoeFromFavoriteShoes.call(shoeId: event.shoeId);
+
+    trueOrFailure.fold(
+          (failure) {
+            emit(ShoesState(
+                shoesStatus: ShoesStatus.deleteShoeFromFavoriteShoesError,
+                errorMessage: mapFailureToMessage(failure: failure,),
+            ),);
+          },
+          (right)  => null,
+    );
+  }
+
+
+  
+  }

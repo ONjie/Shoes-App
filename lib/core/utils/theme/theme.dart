@@ -9,6 +9,7 @@ ThemeData appTheme = ThemeData(
     surface: Color(0xFFFFFFFF),
     tertiary: Color(0xFFEAEAEA),
     error: Color(0xFFB00020),
+    outline: Color(0xFFFFD700),
   ),
 
   textTheme: TextTheme(

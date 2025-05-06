@@ -26,9 +26,9 @@ class ShoesGridViewWidget extends StatelessWidget {
           scrollDirection: Axis.vertical,
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
-              crossAxisSpacing: 4,
-              mainAxisSpacing: 2,
-              childAspectRatio: screenWidth /(screenHeight / 1.6),
+              crossAxisSpacing: 2,
+              mainAxisSpacing: 4,
+              childAspectRatio: screenWidth /(screenHeight / 1.4),
           ),
           itemBuilder: (context, index){
           return ShoeCardWidget(shoe: shoes[index],);

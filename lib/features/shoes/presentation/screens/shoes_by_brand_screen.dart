@@ -83,9 +83,9 @@ class _ShoesByBrandScreenState extends State<ShoesByBrandScreen> {
         dividerColor: Theme.of(context).colorScheme.primary,
         indicatorColor: Theme.of(context).colorScheme.secondary,
         labelColor: Theme.of(context).colorScheme.secondary,
-        labelStyle: Theme.of(context).textTheme.titleMedium,
+        labelStyle: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 18),
         unselectedLabelColor: Theme.of(context).colorScheme.surface,
-        unselectedLabelStyle: Theme.of(context).textTheme.titleMedium,
+        unselectedLabelStyle: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 18),
         tabs: [Text('All'), Text('Men'), Text('Women'), Text('Kid')],
       ),
     );

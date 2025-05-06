@@ -5,6 +5,7 @@ import 'package:shoes_app/features/authentication/presentation/screens/reset_pas
 import 'package:shoes_app/features/authentication/presentation/screens/sign_in_screen.dart';
 import 'package:shoes_app/features/authentication/presentation/screens/sign_up_screen.dart';
 import 'package:shoes_app/features/authentication/presentation/screens/splash_screen.dart';
+import 'package:shoes_app/features/shoes/presentation/screens/shoe_details_screen.dart';
 import 'package:shoes_app/features/shoes/presentation/screens/shoes_by_brand_screen.dart';
 
 final router = GoRouter(
@@ -38,7 +39,7 @@ final router = GoRouter(
       path: '/reset_password',
       builder: (context, state) => ResetPasswordScreen(),
     ),
-     GoRoute(
+    GoRoute(
       name: 'Shoes By Brand Screen',
       path: '/shoes_by_brand/:brand',
       builder: (context, state) {
@@ -50,6 +51,14 @@ final router = GoRouter(
       name: 'Brand Screen',
       path: '/brands',
       builder: (context, state) => BrandsScreen(),
+    ),
+    GoRoute(
+      name: 'Shoe Details Screen',
+      path: '/shoe_details/:shoeId',
+      builder: (context, state) {
+        final shoeId = state.pathParameters['shoeId'];
+        return ShoeDetailsScreen(shoeId: int.tryParse(shoeId!)!);
+      },
     ),
   ],
 );

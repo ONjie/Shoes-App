@@ -5,10 +5,10 @@ class ServerException implements Exception{
   ServerException({required this.message});
 }
 
-class DatabaseException implements Exception{
+class LocalDatabaseException implements Exception{
   final String message;
 
-  DatabaseException({required this.message});
+  LocalDatabaseException({required this.message});
 }
 
 class OtherExceptions implements Exception{

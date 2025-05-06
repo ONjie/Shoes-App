@@ -23,3 +23,18 @@ ShoeModel _$ShoeModelFromJson(Map<String, dynamic> json) => ShoeModel(
   isFavorite: json['isFavorite'] as bool? ?? false,
 );
 
+Map<String, dynamic> _$ShoeModelToJson(ShoeModel instance) => <String, dynamic>{
+  'id': instance.id,
+  'title': instance.title,
+  'description': instance.description,
+  'images': instance.images,
+  'price': instance.price,
+  'brand': instance.brand,
+  'colors': instance.colors,
+  'sizes': instance.sizes,
+  'isPopular': instance.isPopular,
+  'isNew': instance.isNew,
+  'category': instance.category,
+  'ratings': instance.ratings,
+  'isFavorite': instance.isFavorite,
+};

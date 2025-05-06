@@ -17,3 +17,6 @@ export 'utils/common_widgets/shoes_gridview_widget.dart';
 export 'utils/common_widgets/shoes_list_view_widget.dart';
 export 'utils/common_widgets/shoe_image_widget.dart';
 export 'utils/common_widgets/error_state_widget.dart';
+export 'utils/common_widgets/shoe_color_converter_widget.dart';
+export 'utils/common_widgets/snack_bar_widget.dart';
+export 'local_database/local_database.dart';

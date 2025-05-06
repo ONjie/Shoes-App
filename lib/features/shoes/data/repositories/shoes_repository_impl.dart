@@ -1,4 +1,5 @@
 import 'package:either_dart/either.dart';
+import 'package:shoes_app/features/shoes/data/data_sources/local_data/shoes_local_database_service.dart';
 import 'package:shoes_app/features/shoes/data/data_sources/remote_data/shoes_api_service.dart';
 
 import 'package:shoes_app/features/shoes/domain/entities/favorite_shoe_entity.dart';
@@ -15,9 +16,11 @@ class ShoesRepositoryImpl implements ShoesRepository {
   ShoesRepositoryImpl({
     required this.networkInfo,
     required this.shoesApiService,
+    required this.shoesLocalDatabaseService,
   });
   final NetworkInfo networkInfo;
   final ShoesApiService shoesApiService;
+  final ShoesLocalDatabaseService shoesLocalDatabaseService;
 
   Future<FailureOrShoeEntityList> _fetchShoes({
     required _FunctionChooser functionChooser,
@@ -30,6 +33,12 @@ class ShoesRepositoryImpl implements ShoesRepository {
 
     try {
       final fetchedShoes = await functionChooser();
+
+      final favoriteShoes =
+          await shoesLocalDatabaseService.fetchFavoriteShoes();
+
+      final favoriteShoeIds =
+          favoriteShoes.map((favoriteShoe) => favoriteShoe.shoeId).toList();
 
       final shoes =
           fetchedShoes.map((shoe) {
@@ -46,7 +55,7 @@ class ShoesRepositoryImpl implements ShoesRepository {
               isNew: shoe.isNew,
               ratings: shoe.ratings,
               category: shoe.category,
-              isFavorite: false,
+              isFavorite: favoriteShoeIds.contains(shoe.id),
             ).toShoeEntity();
           }).toList();
 
@@ -59,23 +68,82 @@ class ShoesRepositoryImpl implements ShoesRepository {
   @override
   Future<Either<Failure, FavoriteShoeEntity>> addShoeToFavoriteShoes({
     required ShoeEntity shoe,
-  }) {
-    // TODO: implement addShoeToFavoriteShoes
-    throw UnimplementedError();
+  }) async {
+    try {
+      final shoeToBeAdded = ShoeModel.fromShoeEntity(shoeEntity: shoe);
+
+      final favoriteShoe = await shoesLocalDatabaseService
+          .addShoeToFavoriteShoes(shoe: shoeToBeAdded);
+
+      if (favoriteShoe.shoeId != shoe.id) {
+        return const Left(
+          DatabaseFailure(message: addShoeToFavoriteShoesErrorMessage),
+        );
+      }
+
+      final addedShoe = FavoriteShoeEntity(
+        id: favoriteShoe.id,
+        shoeId: favoriteShoe.shoeId,
+        title: favoriteShoe.title,
+        image: favoriteShoe.image,
+        price: favoriteShoe.price,
+        ratings: favoriteShoe.ratings,
+        isFavorite: favoriteShoe.isFavorite == 1,
+      );
+
+      return Right(addedShoe);
+    } catch (e) {
+      print('e: ${e.toString()}');
+      return Left(OtherFailure(message: e.toString()));
+    }
   }
 
   @override
   Future<Either<Failure, bool>> deleteShoeFromFavoriteShoes({
     required int shoeId,
-  }) {
-    // TODO: implement deleteShoeFromFavoriteShoes
-    throw UnimplementedError();
+  }) async {
+    try {
+      final isDeleted = await shoesLocalDatabaseService
+          .deleteShoeFromFavoriteShoes(shoeId: shoeId);
+
+      if (!isDeleted) {
+        return const Left(
+          DatabaseFailure(message: deleteShoeFromFavoriteShoesErrorMessage),
+        );
+      }
+      return Right(isDeleted);
+    } catch (e) {
+      return Left(OtherFailure(message: e.toString()));
+    }
   }
 
   @override
-  Future<Either<Failure, List<FavoriteShoeEntity>>> fetchFavoriteShoes() {
-    // TODO: implement fetchFavoriteShoes
-    throw UnimplementedError();
+  Future<Either<Failure, List<FavoriteShoeEntity>>> fetchFavoriteShoes() async {
+    try {
+      final fetchedShoes = await shoesLocalDatabaseService.fetchFavoriteShoes();
+
+      if (fetchedShoes.isEmpty) {
+        return const Left(
+          DatabaseFailure(message: fetchFavoriteShoesErrorMessage),
+        );
+      }
+      final favoriteShoes =
+          fetchedShoes.map((favoriteShoe) {
+            return FavoriteShoeEntity(
+              id: favoriteShoe.id,
+              shoeId: favoriteShoe.shoeId,
+              title: favoriteShoe.title,
+              image: favoriteShoe.image,
+              price: favoriteShoe.price,
+              ratings: favoriteShoe.ratings,
+              isFavorite: favoriteShoe.isFavorite == 1,
+            );
+          }).toList();
+
+      return Right(favoriteShoes);
+    } catch (e) {
+      return Left(OtherFailure(message: e.toString()));
+    }
   }
 
   @override
@@ -140,7 +208,16 @@ class ShoesRepositoryImpl implements ShoesRepository {
     try {
       final fetchedShoe = await shoesApiService.fetchShoe(shoeId: shoeId);
 
-      return Right(fetchedShoe.toShoeEntity());
+      final favoriteShoes =
+          await shoesLocalDatabaseService.fetchFavoriteShoes();
+
+      final isFavorite = favoriteShoes.any(
+        (favoriteShoe) => favoriteShoe.shoeId == fetchedShoe.id,
+      );
+
+      final shoe = fetchedShoe.copyWith(isFavorite: isFavorite);
+
+      return Right(shoe.toShoeEntity());
     } on ServerException catch (e) {
       return Left(ServerFailure(message: e.message));
     }

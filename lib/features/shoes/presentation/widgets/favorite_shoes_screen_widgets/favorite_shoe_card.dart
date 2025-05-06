@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../features/shoes/domain/entities/shoe_entity.dart';
-import '../../core.dart';
+import '../../../../../core/core.dart';
+import '../../../domain/entities/favorite_shoe_entity.dart';
+import 'favorite_shoe_favorite_icon_widget.dart';
 
-class ShoeCardWidget extends StatelessWidget {
-  const ShoeCardWidget({super.key, required this.shoe});
+class FavoriteShoeCard extends StatelessWidget {
+  const FavoriteShoeCard({super.key, required this.favoriteShoe});
 
-  final ShoeEntity shoe;
+  final FavoriteShoeEntity favoriteShoe;
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        context.go('/shoe_details/${shoe.id}');
+        context.go('/shoe_details/${favoriteShoe.shoeId}');
       },
       child: Card(
         elevation: 0,
@@ -24,7 +25,7 @@ class ShoeCardWidget extends StatelessWidget {
             Stack(
               children: [
                 ShoeImageWidget(
-                  imageUrl: shoe.images[0],
+                  imageUrl: favoriteShoe.image,
                   width: 170,
                   height: 170,
                   topRightRadius: 15,
@@ -35,14 +36,16 @@ class ShoeCardWidget extends StatelessWidget {
                 Positioned(
                   top: 0,
                   right: 0,
-                  child: FavoriteIconWidget(shoe: shoe),
+                  child: FavoriteShoeFavoriteIconWidget(
+                    favoriteShoe: favoriteShoe,
+                  ),
                 ),
               ],
             ),
             Expanded(
               child: ShoeTitleAndPriceWidget(
-                shoeTitle: shoe.title,
-                shoePrice: shoe.price,
+                shoeTitle: favoriteShoe.title,
+                shoePrice: favoriteShoe.price,
               ),
             ),
           ],
