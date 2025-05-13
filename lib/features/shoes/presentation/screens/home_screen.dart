@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 
 import '../../../../core/core.dart';
-import 'cart_screen.dart';
+import '../../../cart/presentation/screens/cart_screen.dart';
 import 'favorite_shoes_screen.dart';
 import 'shoes_screen.dart';
 import 'user_profile_screen.dart';

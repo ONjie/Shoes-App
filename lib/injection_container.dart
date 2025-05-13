@@ -11,6 +11,10 @@ import 'package:shoes_app/features/authentication/domain/use_cases/sign_in.dart'
 import 'package:shoes_app/features/authentication/domain/use_cases/sign_out.dart';
 import 'package:shoes_app/features/authentication/domain/use_cases/sign_up.dart';
 import 'package:shoes_app/features/authentication/presentation/bloc/authentication_bloc.dart';
+import 'package:shoes_app/features/cart/data/data_sources/local_data/cart_local_database_service.dart';
+import 'package:shoes_app/features/cart/data/repositories/cart_repository_impl.dart';
+import 'package:shoes_app/features/cart/domain/repositories/cart_repository.dart';
+import 'package:shoes_app/features/cart/domain/use_cases/use_cases.dart';
 import 'package:shoes_app/features/shoes/data/data_sources/local_data/shoes_local_database_service.dart';
 import 'package:shoes_app/features/shoes/data/data_sources/remote_data/shoes_api_service.dart';
 import 'package:shoes_app/features/shoes/data/repositories/shoes_repository_impl.dart';
@@ -19,6 +23,7 @@ import 'package:shoes_app/features/shoes/presentation/bloc/shoes_bloc.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'features/authentication/domain/use_cases/reset_password.dart';
+import 'features/cart/presentation/bloc/cart_bloc.dart';
 import 'features/shoes/domain/use_cases/use_cases.dart';
 
 final locator = GetIt.instance;
@@ -53,7 +58,18 @@ Future<void> init() async {
       fetchShoe: locator(),
       fetchFavoriteShoes: locator(),
       addShoeToFavoriteShoes: locator(),
-      deleteShoeFromFavoriteShoes: locator()
+      deleteShoeFromFavoriteShoes: locator(),
+    ),
+  );
+
+  //cart bloc
+  locator.registerFactory(
+    () => CartBloc(
+      addCartItem: locator(),
+      deleteCartItem: locator(),
+      deleteCartItems: locator(),
+      fetchCartItems: locator(),
+      updateCartItemQuantity: locator(),
     ),
   );
 
@@ -117,6 +133,21 @@ Future<void> init() async {
     () => DeleteShoeFromFavoriteShoes(shoesRepository: locator()),
   );
 
+  //cart use_cases
+  locator.registerLazySingleton(() => AddCartItem(cartRepository: locator()));
+  locator.registerLazySingleton(
+    () => DeleteCartItem(cartRepository: locator()),
+  );
+  locator.registerLazySingleton(
+    () => DeleteCartItems(cartRepository: locator()),
+  );
+  locator.registerLazySingleton(
+    () => UpdateCartItemQuantity(cartRepository: locator()),
+  );
+  locator.registerLazySingleton(
+    () => FetchCartItems(cartRepository: locator()),
+  );
+
   //registering repositories
 
   //authentication repository
@@ -136,6 +167,11 @@ Future<void> init() async {
     ),
   );
 
+  //cart repository
+  locator.registerLazySingleton<CartRepository>(
+    () => CartRepositoryImpl(cartLocalDatabaseService: locator()),
+  );
+
   //registering dataSources
   // authentication datasource
   locator.registerLazySingleton<SupabaseAuthService>(
@@ -152,6 +188,13 @@ Future<void> init() async {
   locator.registerLazySingleton<ShoesLocalDatabaseService>(
     () => ShoesLocalDatabaseServiceImpl(appDatabase: locator()),
   );
+
+  //cart datasources
+  //local data
+  locator.registerLazySingleton<CartLocalDatabaseService>(
+    () => CartLocalDatabaseServiceImpl(appDatabase: locator()),
+  );
+
 
   //registering SupabaseClient
   final supabaseClient = Supabase.instance.client;

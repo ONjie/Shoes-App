@@ -76,8 +76,8 @@ class ShoesRepositoryImpl implements ShoesRepository {
           .addShoeToFavoriteShoes(shoe: shoeToBeAdded);
 
       if (favoriteShoe.shoeId != shoe.id) {
-        return const Left(
-          DatabaseFailure(message: addShoeToFavoriteShoesErrorMessage),
+        return Left(
+          LocalDatabaseFailure(message: addShoeToFavoriteShoesErrorMessage),
         );
       }
 
@@ -107,8 +107,10 @@ class ShoesRepositoryImpl implements ShoesRepository {
           .deleteShoeFromFavoriteShoes(shoeId: shoeId);
 
       if (!isDeleted) {
-        return const Left(
-          DatabaseFailure(message: deleteShoeFromFavoriteShoesErrorMessage),
+        return Left(
+          LocalDatabaseFailure(
+            message: deleteShoeFromFavoriteShoesErrorMessage,
+          ),
         );
       }
       return Right(isDeleted);
@@ -123,8 +125,8 @@ class ShoesRepositoryImpl implements ShoesRepository {
       final fetchedShoes = await shoesLocalDatabaseService.fetchFavoriteShoes();
 
       if (fetchedShoes.isEmpty) {
-        return const Left(
-          DatabaseFailure(message: fetchFavoriteShoesErrorMessage),
+        return Left(
+          LocalDatabaseFailure(message: fetchFavoriteShoesErrorMessage),
         );
       }
       final favoriteShoes =

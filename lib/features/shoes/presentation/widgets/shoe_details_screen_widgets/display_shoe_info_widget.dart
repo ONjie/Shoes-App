@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../../core/core.dart';
+import '../../../../cart/presentation/bloc/cart_bloc.dart';
 import '../../../domain/entities/shoe_entity.dart';
 import 'on_validate.dart';
 import 'price_and_rating_widget.dart';
@@ -38,31 +41,55 @@ class _DisplayShoeInfoWidgetState extends State<DisplayShoeInfoWidget> {
     });
   }
 
- /* void _delayedNavigation() async {
+  void _delayedNavigation() async {
     await Future.delayed(const Duration(seconds: 2)).whenComplete(() {
       if (!mounted) return;
       context.go('/home/2');
     });
-  }*/
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 12, right: 12, left: 12, bottom: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          PriceAndRatingWidget(
-            price: widget.shoe.price.toInt(),
-            ratings: widget.shoe.ratings,
-          ),
-          const SizedBox(height: 8),
-          ShoeDescriptionWidget(shoeDescription: widget.shoe.description),
-          const SizedBox(height: 8),
-          sizeColorWidget(),
-          const SizedBox(height: 40),
-          addToCartBuyNowWidgets(),
-        ],
+    return BlocListener<CartBloc, CartState>(
+      listener: (context, state) {
+       if (state.cartItemsStatus == CartItemsStatus.cartItemAdded) {
+            snackBarWidget(
+              message: state.successMessage!,
+              bgColor: Theme.of(context).colorScheme.primary,
+              duration: 2, context: context,
+            );
+          _delayedNavigation();
+        }
+        if (state.cartItemsStatus == CartItemsStatus.fetchCartItemsError) {
+            snackBarWidget(
+              message: state.errorMessage!,
+              bgColor: Theme.of(context).colorScheme.error,
+              duration: 2, context: context,
+            );
+        }
+      },
+      child: Padding(
+        padding: const EdgeInsets.only(
+          top: 12,
+          right: 12,
+          left: 12,
+          bottom: 16,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            PriceAndRatingWidget(
+              price: widget.shoe.price.toInt(),
+              ratings: widget.shoe.ratings,
+            ),
+            const SizedBox(height: 8),
+            ShoeDescriptionWidget(shoeDescription: widget.shoe.description),
+            const SizedBox(height: 8),
+            sizeColorWidget(),
+            const SizedBox(height: 40),
+            addToCartBuyNowWidgets(),
+          ],
+        ),
       ),
     );
   }
@@ -139,16 +166,16 @@ class _DisplayShoeInfoWidgetState extends State<DisplayShoeInfoWidget> {
   Widget colorsWidget() {
     return Container(
       decoration: BoxDecoration(
-        border: Border.all(color: Theme.of(context).colorScheme.primary, width: 1),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.primary,
+          width: 1,
+        ),
         borderRadius: BorderRadius.circular(20),
       ),
       padding: const EdgeInsets.only(left: 2, right: 2),
       child: Row(
         children: [
-          Text(
-            'Color',
-            style: Theme.of(context).textTheme.labelLarge
-          ),
+          Text('Color', style: Theme.of(context).textTheme.labelLarge),
           const SizedBox(width: 10),
           colorDropDownWidget(),
         ],
@@ -165,7 +192,7 @@ class _DisplayShoeInfoWidgetState extends State<DisplayShoeInfoWidget> {
           backgroundColor: shoeColorConverterWidget(colorValue: shoeColor),
         ),
         elevation: 0,
-        underline: Container(color: Theme.of(context).colorScheme.surface,),
+        underline: Container(color: Theme.of(context).colorScheme.surface),
         icon: const Icon(Icons.arrow_drop_down),
         items:
             widget.shoe.colors.map((String value) {
@@ -221,7 +248,7 @@ class _DisplayShoeInfoWidgetState extends State<DisplayShoeInfoWidget> {
           textColor: Theme.of(context).colorScheme.primary,
           textFontSize: 19,
           buttonWidth: MediaQuery.of(context).size.width * 0.4,
-          backgroundColor:  Theme.of(context).colorScheme.surface,
+          backgroundColor: Theme.of(context).colorScheme.surface,
           surfaceTintColor: Theme.of(context).colorScheme.surface,
           radius: 5,
           borderSideColor: Theme.of(context).colorScheme.primary,

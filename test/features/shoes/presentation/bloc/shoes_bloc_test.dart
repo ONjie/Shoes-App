@@ -213,9 +213,6 @@ void main() {
         ).thenAnswer(
           (_) async => const Left(ServerFailure(message: errorMessage)),
         );
-    
-      
-
       },
       build: () => shoesBloc,
       act:
@@ -422,88 +419,117 @@ void main() {
   });
 
   group('_onFetchFavoriteShoes', () {
-    blocTest('should emit [ShoesStatus.loading, ShoesStatus.favoriteShoesFetched] when successful',
+    blocTest(
+      'should emit [ShoesStatus.loading, ShoesStatus.favoriteShoesFetched] when successful',
       setUp: () {
-        when(() => mockFetchFavoriteShoes.call())
-            .thenAnswer((_) async => const Right([tFavoriteShoe]));
+        when(
+          () => mockFetchFavoriteShoes.call(),
+        ).thenAnswer((_) async => const Right([tFavoriteShoe]));
       },
       build: () => shoesBloc,
       act: (bloc) => bloc.add(FetchFavoriteShoesEvent()),
-      expect: () => [
-        const ShoesState(shoesStatus: ShoesStatus.loading),
-         const ShoesState(
-          shoesStatus: ShoesStatus.favoriteShoesFetched,
-          favoriteShoes: [tFavoriteShoe],
-        ),
-      ],
+      expect:
+          () => [
+            const ShoesState(shoesStatus: ShoesStatus.loading),
+            const ShoesState(
+              shoesStatus: ShoesStatus.favoriteShoesFetched,
+              favoriteShoes: [tFavoriteShoe],
+            ),
+          ],
     );
 
-    blocTest('should emit [ShoesStatus.loading, ShoesStatus.fetchFavoriteShoesError] when unsuccessful',
+    blocTest(
+      'should emit [ShoesStatus.loading, ShoesStatus.fetchFavoriteShoesError] when unsuccessful',
       setUp: () {
-        when(() => mockFetchFavoriteShoes.call())
-            .thenAnswer((_) async => const Left(DatabaseFailure(message: errorMessage)));
+        when(() => mockFetchFavoriteShoes.call()).thenAnswer(
+          (_) async => const Left(LocalDatabaseFailure(message: errorMessage)),
+        );
       },
       build: () => shoesBloc,
       act: (bloc) => bloc.add(FetchFavoriteShoesEvent()),
-      expect: () => [
-        const ShoesState(shoesStatus: ShoesStatus.loading),
-        const ShoesState(shoesStatus: ShoesStatus.fetchFavoriteShoesError, errorMessage: errorMessage),
-      ],
+      expect:
+          () => [
+            const ShoesState(shoesStatus: ShoesStatus.loading),
+            const ShoesState(
+              shoesStatus: ShoesStatus.fetchFavoriteShoesError,
+              errorMessage: errorMessage,
+            ),
+          ],
     );
   });
 
   group('_onAddShoeToFavoriteShoes', () {
-    blocTest('should emit [] when successful',
+    blocTest(
+      'should emit [] when successful',
       setUp: () {
-        when(() => mockAddShoeToFavoriteShoes.call(shoe: tShoe))
-            .thenAnswer((_) async => const Right(tFavoriteShoe));
+        when(
+          () => mockAddShoeToFavoriteShoes.call(shoe: tShoe),
+        ).thenAnswer((_) async => const Right(tFavoriteShoe));
       },
       build: () => shoesBloc,
       act: (bloc) => bloc.add(const AddShoeToFavoriteShoesEvent(shoe: tShoe)),
       expect: () => null,
     );
 
-    blocTest('should emit [ShoesStatus.addShoeToFavoriteShoesError] when unsuccessful',
+    blocTest(
+      'should emit [ShoesStatus.addShoeToFavoriteShoesError] when unsuccessful',
       setUp: () {
-        when(() => mockAddShoeToFavoriteShoes.call(shoe: tShoe))
-            .thenAnswer((_) async => const Left(DatabaseFailure(message: errorMessage)));
+        when(() => mockAddShoeToFavoriteShoes.call(shoe: tShoe)).thenAnswer(
+          (_) async => const Left(LocalDatabaseFailure(message: errorMessage)),
+        );
       },
       build: () => shoesBloc,
       act: (bloc) => bloc.add(const AddShoeToFavoriteShoesEvent(shoe: tShoe)),
-      expect: () => [
-        const ShoesState(
-          shoesStatus: ShoesStatus.addShoeToFavoriteShoesError,
-          errorMessage: errorMessage,
-        ),
-      ],
+      expect:
+          () => [
+            const ShoesState(
+              shoesStatus: ShoesStatus.addShoeToFavoriteShoesError,
+              errorMessage: errorMessage,
+            ),
+          ],
     );
   });
 
   group('_onDeleteShoeFromFavoriteShoes', () {
     const tShoeId = 1;
-    blocTest('should emit [] when successful',
+    blocTest(
+      'should emit [] when successful',
       setUp: () {
-        when(() => mockDeleteShoeFromFavoriteShoes.call(shoeId: any(named: 'shoeId')))
-            .thenAnswer((_) async => const Right(true));
+        when(
+          () => mockDeleteShoeFromFavoriteShoes.call(
+            shoeId: any(named: 'shoeId'),
+          ),
+        ).thenAnswer((_) async => const Right(true));
       },
       build: () => shoesBloc,
-      act: (bloc) => bloc.add(const DeleteShoeFromFavoriteShoesEvent(shoeId: tShoeId)),
+      act:
+          (bloc) =>
+              bloc.add(const DeleteShoeFromFavoriteShoesEvent(shoeId: tShoeId)),
       expect: () => null,
     );
 
-    blocTest('should emit [ShoesStatus.deleteShoeFromFavoriteShoesError] when unsuccessful',
+    blocTest(
+      'should emit [ShoesStatus.deleteShoeFromFavoriteShoesError] when unsuccessful',
       setUp: () {
-        when(() => mockDeleteShoeFromFavoriteShoes.call(shoeId: any(named: 'shoeId')))
-            .thenAnswer((_) async => const Left(DatabaseFailure(message: errorMessage)));
+        when(
+          () => mockDeleteShoeFromFavoriteShoes.call(
+            shoeId: any(named: 'shoeId'),
+          ),
+        ).thenAnswer(
+          (_) async => const Left(LocalDatabaseFailure(message: errorMessage)),
+        );
       },
       build: () => shoesBloc,
-      act: (bloc) => bloc.add(const DeleteShoeFromFavoriteShoesEvent(shoeId: tShoeId)),
-      expect: () => [
-        const ShoesState(
-          shoesStatus: ShoesStatus.deleteShoeFromFavoriteShoesError,
-          errorMessage: errorMessage,
-        ),
-      ],
+      act:
+          (bloc) =>
+              bloc.add(const DeleteShoeFromFavoriteShoesEvent(shoeId: tShoeId)),
+      expect:
+          () => [
+            const ShoesState(
+              shoesStatus: ShoesStatus.deleteShoeFromFavoriteShoesError,
+              errorMessage: errorMessage,
+            ),
+          ],
     );
   });
 }

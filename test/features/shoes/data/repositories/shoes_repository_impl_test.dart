@@ -177,7 +177,7 @@ void main() {
         expect(
           result.left,
           equals(
-            const DatabaseFailure(message: addShoeToFavoriteShoesErrorMessage),
+            LocalDatabaseFailure(message: addShoeToFavoriteShoesErrorMessage),
           ),
         );
         verify(
@@ -270,7 +270,7 @@ void main() {
         expect(
           result.left,
           equals(
-            const DatabaseFailure(
+            LocalDatabaseFailure(
               message: deleteShoeFromFavoriteShoesErrorMessage,
             ),
           ),
@@ -357,9 +357,7 @@ void main() {
         expect(result, equals(isA<Left<Failure, List<FavoriteShoeEntity>>>()));
         expect(
           result.left,
-          equals(
-            const DatabaseFailure(message: fetchFavoriteShoesErrorMessage),
-          ),
+          equals(LocalDatabaseFailure(message: fetchFavoriteShoesErrorMessage)),
         );
         verify(
           () => mockShoesLocalDatabaseService.fetchFavoriteShoes(),
@@ -433,7 +431,7 @@ void main() {
           expect(
             result,
             equals(
-              const Left(
+              Left(
                 InternetConnectionFailure(message: noInternetConnectionMessage),
               ),
             ),
@@ -517,7 +515,7 @@ void main() {
           expect(
             result,
             equals(
-              const Left(
+              Left(
                 InternetConnectionFailure(message: noInternetConnectionMessage),
               ),
             ),

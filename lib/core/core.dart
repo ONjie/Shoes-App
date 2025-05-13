@@ -20,3 +20,7 @@ export 'utils/common_widgets/error_state_widget.dart';
 export 'utils/common_widgets/shoe_color_converter_widget.dart';
 export 'utils/common_widgets/snack_bar_widget.dart';
 export 'local_database/local_database.dart';
+export 'utils/common_widgets/total_cost_row_widget.dart';
+export 'utils/common_widgets/item_count_and_total_shoes_price_row_widget.dart';
+export 'utils/common_widgets/delivery_charge_row_widget.dart';
+export 'utils/common_widgets/dismissible_background_widget.dart';
