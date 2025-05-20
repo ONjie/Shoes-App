@@ -7,19 +7,13 @@ import '../../../../../core/core.dart';
 
 abstract class UserRemoteDatabaseService {
   Future<UserModel> fetchUser();
-  Future<bool> updateUsername({
-    required String userId,
-    required String newUsername,
-  });
-  Future<bool> updateProfilePicture({
-    required String userId,
-    required String newProfilePicture,
-  });
   Future<void> createUserAccount({
     required String username,
     required String email,
     required String userId,
   });
+
+  Future<bool> updateUserProfile({required UserModel user});
 
   Future<String> uploadImageToStorage({required File image});
 }
@@ -42,7 +36,7 @@ class UserRemoteDatabaseServiceImpl implements UserRemoteDatabaseService {
         'profile_picture': '',
       });
     } catch (e) {
-     throw SupabaseDatabaseException(message: e.toString());
+      throw SupabaseDatabaseException(message: e.toString());
     }
   }
 
@@ -65,40 +59,6 @@ class UserRemoteDatabaseServiceImpl implements UserRemoteDatabaseService {
   }
 
   @override
-  Future<bool> updateProfilePicture({
-    required String userId,
-    required String newProfilePicture,
-  }) async {
-    try {
-      await supabaseClient
-          .from('accounts')
-          .update({'profile_picture': newProfilePicture})
-          .eq('id', userId);
-
-      return true;
-    } catch (e) {   
-        throw SupabaseDatabaseException(message: e.toString());
-    }
-  }
-
-  @override
-  Future<bool> updateUsername({
-    required String userId,
-    required String newUsername,
-  }) async {
-    try {
-      await supabaseClient
-          .from('accounts')
-          .update({'username': newUsername})
-          .eq('id', userId);
-
-      return true;
-    } catch (e) {
-      throw SupabaseDatabaseException(message: e.toString());
-    }
-  }
-
-  @override
   Future<String> uploadImageToStorage({required File image}) async {
     try {
       final fileName = DateTime.now().microsecondsSinceEpoch.toString();
@@ -115,7 +75,7 @@ class UserRemoteDatabaseServiceImpl implements UserRemoteDatabaseService {
 
       final uploadedImageUrl = supabaseClient.storage
           .from('shoes-app-bucket')
-          .getPublicUrl(filePath);
+          .createSignedUrl(filePath, 31556926);
 
       return uploadedImageUrl;
     } catch (e) {
@@ -123,6 +83,20 @@ class UserRemoteDatabaseServiceImpl implements UserRemoteDatabaseService {
         rethrow;
       }
       throw OtherExceptions(message: e.toString());
+    }
+  }
+
+  @override
+  Future<bool> updateUserProfile({required UserModel user}) async {
+    try {
+      await supabaseClient
+          .from('accounts')
+          .update(user.toJson())
+          .eq('id', user.userId!);
+
+      return true;
+    } catch (e) {
+      throw SupabaseDatabaseException(message: e.toString());
     }
   }
 }

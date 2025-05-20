@@ -7,25 +7,18 @@ class FetchUserEvent extends UserEvent {
   List<Object?> get props => [];
 }
 
-class UpdateProfilePictureEvent extends UserEvent {
-  final File newProfilePicture;
-  final String userId;
+class UpdateUserProfileEvent extends UserEvent {
+  final File? newProfilePicture;
+  final String? newUsername;
+  final UserEntity user;
 
-  UpdateProfilePictureEvent({
-    required this.newProfilePicture,
-    required this.userId,
+  UpdateUserProfileEvent({
+    required this.user,
+    this.newProfilePicture,
+    this.newUsername,
   });
 
   @override
-  List<Object?> get props => [newProfilePicture, userId];
+  List<Object?> get props => [newProfilePicture, newUsername];
 }
 
-class UpdateUsernameEvent extends UserEvent {
-  final String newUsername;
-  final String userId;
-
-  UpdateUsernameEvent({required this.newUsername, required this.userId});
-
-  @override
-  List<Object?> get props => [newUsername, userId];
-}

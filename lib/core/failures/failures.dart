@@ -40,3 +40,8 @@ class SupabaseStorageFailure extends Failure {
 class StripePaymentFailure extends Failure {
   const StripePaymentFailure({required super.message});
 }
+
+class InvalidUpdateFailure extends Failure{
+  const InvalidUpdateFailure({required super.message});
+  
+}

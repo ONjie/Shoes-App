@@ -7,9 +7,10 @@ typedef EitherFailureOrBool = Either<Failure, bool>;
 
 abstract class UserRepository {
   Future<Either<Failure, UserEntity>> fetchUser();
-  Future<EitherFailureOrBool> updateUsername({required String userId, required String newUsername});
-  Future<EitherFailureOrBool> updateProfilePicture({
-    required String userId,
-    required File newProfilePicture,
+
+  Future<Either<Failure, bool>> updateUserProfile({
+    required UserEntity user,
+   String? newUsername,
+   File? newProfilePicture,
   });
 }

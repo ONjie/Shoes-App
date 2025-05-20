@@ -7,6 +7,10 @@ import 'package:shoes_app/features/authentication/presentation/screens/sign_up_s
 import 'package:shoes_app/features/authentication/presentation/screens/splash_screen.dart';
 import 'package:shoes_app/features/shoes/presentation/screens/shoe_details_screen.dart';
 import 'package:shoes_app/features/shoes/presentation/screens/shoes_by_brand_screen.dart';
+import 'package:shoes_app/features/user/domain/entities/user_entity.dart';
+import 'package:shoes_app/features/user/presentation/screens/edit_profile_screen.dart';
+
+import '../../features/authentication/presentation/screens/change_password_screen.dart';
 
 final router = GoRouter(
   initialLocation: '/',
@@ -58,6 +62,22 @@ final router = GoRouter(
       builder: (context, state) {
         final shoeId = state.pathParameters['shoeId'];
         return ShoeDetailsScreen(shoeId: int.tryParse(shoeId!)!);
+      },
+    ),
+    GoRoute(
+      name: 'Edit Profile Screen',
+      path: '/edit_profile',
+      builder: (context, state) {
+        final user = state.extra as UserEntity;
+        return EditProfileScreen(user: user);
+      },
+    ),
+    GoRoute(
+      name: 'Change Password Screen',
+      path: '/change_password/:email',
+      builder: (context, state) {
+        final email = state.pathParameters['email'];
+        return ChangePasswordScreen(email: email!);
       },
     ),
   ],

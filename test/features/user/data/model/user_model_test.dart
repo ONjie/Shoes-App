@@ -14,6 +14,7 @@ void main() {
     username: 'username',
     email: 'email',
     profilePicture: 'profilePicture',
+    updatedAt: DateTime.parse('2025-04-14 22:07:31.934909')
   );
 
   final tUserEntity = UserEntity(

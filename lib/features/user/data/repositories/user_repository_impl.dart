@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:either_dart/either.dart';
 import 'package:shoes_app/core/core.dart';
 import 'package:shoes_app/features/user/data/data_sources/remote_data/user_remote_database_service.dart';
+import 'package:shoes_app/features/user/data/models/user_model.dart';
 
 import 'package:shoes_app/features/user/domain/entities/user_entity.dart';
 
@@ -18,7 +19,6 @@ class UserRepositoryImpl implements UserRepository {
 
   final UserRemoteDatabaseService userRemoteDatabaseService;
 
-  
   @override
   Future<Either<Failure, UserEntity>> fetchUser() async {
     if (!await networkInfo.isConnected) {
@@ -37,9 +37,10 @@ class UserRepositoryImpl implements UserRepository {
   }
 
   @override
-  Future<EitherFailureOrBool> updateProfilePicture({
-    required String userId,
-    required File newProfilePicture,
+  Future<Either<Failure, bool>> updateUserProfile({
+    required UserEntity user,
+    String? newUsername,
+    File? newProfilePicture,
   }) async {
     if (!await networkInfo.isConnected) {
       return Left(
@@ -47,15 +48,28 @@ class UserRepositoryImpl implements UserRepository {
       );
     }
 
+    if (newUsername == null && newProfilePicture == null) {
+      return Left(InvalidUpdateFailure(message: 'No fields to update'));
+    }
+
     try {
-      final uploadedImageUrl = await userRemoteDatabaseService
-          .uploadImageToStorage(image: newProfilePicture);
+      String updatedUsername = newUsername ?? user.username;
+      String updatedProfilePicture = user.profilePicture;
 
-      final result = await userRemoteDatabaseService.updateProfilePicture(
-        userId: userId,
-        newProfilePicture: uploadedImageUrl,
+      if (newProfilePicture != null) {
+        updatedProfilePicture = await userRemoteDatabaseService
+            .uploadImageToStorage(image: newProfilePicture);
+      }
+
+      final result = await userRemoteDatabaseService.updateUserProfile(
+        user: UserModel(
+          userId: user.userId!,
+          username: updatedUsername,
+          email: user.email,
+          profilePicture: updatedProfilePicture,
+          updatedAt: DateTime.now(),
+        ),
       );
-
       return Right(result);
     } on SupabaseStorageException catch (e) {
       return Left(SupabaseStorageFailure(message: e.message));
@@ -63,29 +77,6 @@ class UserRepositoryImpl implements UserRepository {
       return Left(SupabaseDatabaseFailure(message: e.message));
     } on OtherExceptions catch (e) {
       return Left(OtherFailure(message: e.message));
-    }
-  }
-
-  @override
-  Future<EitherFailureOrBool> updateUsername({
-    required String userId,
-    required String newUsername,
-  }) async {
-    if (!await networkInfo.isConnected) {
-      return Left(
-        InternetConnectionFailure(message: noInternetConnectionMessage),
-      );
-    }
-
-    try {
-      final result = await userRemoteDatabaseService.updateUsername(
-        userId: userId,
-        newUsername: newUsername,
-      );
-
-      return Right(result);
-    } on SupabaseDatabaseException catch (e) {
-      return Left(SupabaseDatabaseFailure(message: e.message));
     }
   }
 }

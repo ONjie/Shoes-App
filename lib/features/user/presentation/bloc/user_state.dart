@@ -1,18 +1,15 @@
-
 part of 'user_bloc.dart';
 
-enum UserStatus{
+enum UserStatus {
   initial,
   loading,
   userFetched,
   fetchUserError,
-  profilePictureUpdated,
-  updateProfilePictureError,
-  usernameUpdated,
-  updateUsernameError,
+  userProfileUpdated,
+  updateUserProfileError,
 }
 
-class UserState extends Equatable{
+class UserState extends Equatable {
   final UserStatus userStatus;
   final UserEntity? user;
   final String? errorMessage;
@@ -21,6 +18,4 @@ class UserState extends Equatable{
 
   @override
   List<Object?> get props => [userStatus, user, errorMessage];
-
 }
-

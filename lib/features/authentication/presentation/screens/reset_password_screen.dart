@@ -66,13 +66,12 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                 if (state.authenticationStatus ==
                     AuthenticationStatus.resetPasswordOTPSent) {
                   Navigator.pop(context);
-                  return ResetPasswordFormWidget();
+                  return ResetPasswordFormWidget(sizedBoxHeight:  MediaQuery.of(context).size.height * 0.1,);
                 }
                 return SendOtpCodeFormWidget();
               },
               listener: (context, state){
                 if(state.authenticationStatus == AuthenticationStatus.resetPasswordSuccess){
-
                   Navigator.pop(context);
                   context.go('/sign_in');
 

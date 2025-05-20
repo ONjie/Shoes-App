@@ -50,7 +50,7 @@ class _SignInScreenState extends State<SignInScreen> {
     return BlocListener<AuthenticationBloc, AuthenticationState>(
       listener: (context, state) {
         if (state.authenticationStatus == AuthenticationStatus.signInSuccess) {
-          context.go('/home');
+          context.go('/home/0');
         }
       },
       child: SafeArea(

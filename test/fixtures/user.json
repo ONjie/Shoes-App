@@ -1,6 +1,7 @@
 {
-    "userId": "userId",
+    "id": "userId",
     "username": "username",
     "email": "email",
-    "profilePicture": "profilePicture"
+    "profile_picture": "profilePicture",
+    "updated_at": "2025-04-14 22:07:31.934909"
 }

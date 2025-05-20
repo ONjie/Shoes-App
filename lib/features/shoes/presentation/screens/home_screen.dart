@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/core.dart';
 import '../../../cart/presentation/screens/cart_screen.dart';
+import '../../../user/presentation/screens/user_profile_screen.dart';
 import 'favorite_shoes_screen.dart';
 import 'shoes_screen.dart';
-import 'user_profile_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key, required this.screenIndex});

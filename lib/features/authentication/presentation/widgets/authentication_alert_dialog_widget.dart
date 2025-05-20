@@ -30,7 +30,7 @@ Future<dynamic> authenticationAlertDialogWidget({
                 return displaySuccessOrErrorMessage(
                   successOrErrorMessage: state.message!,
                   textColor: Colors.red,
-                  context: context
+                  context: context,
                 );
               }
 
@@ -44,7 +44,7 @@ Future<dynamic> authenticationAlertDialogWidget({
               }
 
               if (state.authenticationStatus ==
-                  AuthenticationStatus.resetPasswordOTPError) {
+                  AuthenticationStatus.sendResetPasswordOTPError) {
                 return displaySuccessOrErrorMessage(
                   successOrErrorMessage: state.message!,
                   textColor: Colors.red,

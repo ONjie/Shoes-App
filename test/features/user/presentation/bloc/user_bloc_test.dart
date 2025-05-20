@@ -7,31 +7,24 @@ import 'package:mocktail/mocktail.dart';
 import 'package:shoes_app/core/core.dart';
 import 'package:shoes_app/features/user/domain/entities/user_entity.dart';
 import 'package:shoes_app/features/user/domain/use_cases/fetch_user.dart';
-import 'package:shoes_app/features/user/domain/use_cases/update_profile_picture.dart';
-import 'package:shoes_app/features/user/domain/use_cases/update_username.dart';
+import 'package:shoes_app/features/user/domain/use_cases/update_user_profile.dart';
 import 'package:shoes_app/features/user/presentation/bloc/user_bloc.dart';
 
 class MockFetchUser extends Mock implements FetchUser {}
 
-class MockUpdateProfilePicture extends Mock implements UpdateProfilePicture {}
-
-class MockUpdateUsername extends Mock implements UpdateUsername {}
+class MockUpdateUserProfile extends Mock implements UpdateUserProfile {}
 
 void main() {
   late UserBloc userBloc;
   late MockFetchUser mockFetchUser;
-  late MockUpdateProfilePicture mockUpdateProfilePicture;
-  late MockUpdateUsername mockUpdateUsername;
+  late MockUpdateUserProfile mockUpdateUserProfile;
 
   setUp(() {
     mockFetchUser = MockFetchUser();
-    mockUpdateProfilePicture = MockUpdateProfilePicture();
-    mockUpdateUsername = MockUpdateUsername();
-
+    mockUpdateUserProfile = MockUpdateUserProfile();
     userBloc = UserBloc(
       fetchUser: mockFetchUser,
-      updateProfilePicture: mockUpdateProfilePicture,
-      updateUsername: mockUpdateUsername,
+      updateUserProfile: mockUpdateUserProfile,
     );
   });
 
@@ -41,6 +34,9 @@ void main() {
     email: 'email',
     profilePicture: 'profilePicture',
   );
+
+  final tNewProfilePicture = File('new_profile_picture.jpeg');
+  const tNewUsername = 'newUsername';
 
   group('_onFetchUser', () {
     blocTest(
@@ -78,48 +74,48 @@ void main() {
     );
   });
 
-  group('_onUpdateProfilePicture', () {
-    final tNewProfilePicture = File('newProfilePicture');
+  group('_onUpdateUserProfile', () {
     blocTest(
-      'should emit [UserStatus.loading, UserStatus.updateProfilePictureError] when call is unsuccessful',
+      'should emit [UserStatus.loading, UserStatus.updateUserProfileError] when call is unsuccessful',
       setUp: () {
         when(
-          () => mockUpdateProfilePicture.call(
-            userId: tUser.userId!,
+          () => mockUpdateUserProfile(
+            user: tUser,
+            newUsername: tNewUsername,
             newProfilePicture: tNewProfilePicture,
           ),
         ).thenAnswer(
           (_) async => Left(
-            SupabaseDatabaseFailure(
-              message: 'Failed to update profile picture',
-            ),
+            SupabaseDatabaseFailure(message: 'Failed to update user profile'),
           ),
         );
       },
       build: () => userBloc,
       act:
           (bloc) => bloc.add(
-            UpdateProfilePictureEvent(
+            UpdateUserProfileEvent(
+              user: tUser,
+              newUsername: tNewUsername,
               newProfilePicture: tNewProfilePicture,
-              userId: tUser.userId!,
             ),
           ),
       expect:
           () => [
             UserState(userStatus: UserStatus.loading),
             UserState(
-              userStatus: UserStatus.updateProfilePictureError,
-              errorMessage: 'Failed to update profile picture',
+              userStatus: UserStatus.updateUserProfileError,
+              errorMessage: 'Failed to update user profile',
             ),
           ],
     );
 
     blocTest(
-      'should emit [UserStatus.loading, UserStatus.profilePictureUpdated] when call is successful',
+      'should emit [UserStatus.loading, UserStatus.userProfileUpdated] when call is successful',
       setUp: () {
         when(
-          () => mockUpdateProfilePicture.call(
-            userId: tUser.userId!,
+          () => mockUpdateUserProfile(
+            user: tUser,
+            newUsername: tNewUsername,
             newProfilePicture: tNewProfilePicture,
           ),
         ).thenAnswer((_) async => Right(true));
@@ -127,75 +123,16 @@ void main() {
       build: () => userBloc,
       act:
           (bloc) => bloc.add(
-            UpdateProfilePictureEvent(
+            UpdateUserProfileEvent(
+              user: tUser,
+              newUsername: tNewUsername,
               newProfilePicture: tNewProfilePicture,
-              userId: tUser.userId!,
             ),
           ),
       expect:
           () => [
             UserState(userStatus: UserStatus.loading),
-            UserState(userStatus: UserStatus.profilePictureUpdated),
-          ],
-    );
-  });
-
-  group('_onUpdateUsername', () {
-    const tNewUsername = 'newUsername';
-    blocTest(
-      'should emit [UserStatus.loading, UserStatus.updateUsernameError] when call is unsuccessful',
-      setUp: () {
-        when(
-          () => mockUpdateUsername.call(
-            userId: tUser.userId!,
-            newUsername: tNewUsername,
-          ),
-        ).thenAnswer(
-          (_) async => Left(
-            SupabaseDatabaseFailure(message: 'Failed to update username'),
-          ),
-        );
-      },
-      build: () => userBloc,
-      act:
-          (bloc) => bloc.add(
-            UpdateUsernameEvent(
-              newUsername: tNewUsername,
-              userId: tUser.userId!,
-            ),
-          ),
-      expect:
-          () => [
-            UserState(userStatus: UserStatus.loading),
-            UserState(
-              userStatus: UserStatus.updateUsernameError,
-              errorMessage: 'Failed to update username',
-            ),
-          ],
-    );
-
-    blocTest(
-      'should emit [UserStatus.loading, UserStatus.usernameUpdated] when call is successful',
-      setUp: () {
-        when(
-          () => mockUpdateUsername.call(
-            userId: tUser.userId!,
-            newUsername: tNewUsername,
-          ),
-        ).thenAnswer((_) async => Right(true));
-      },
-      build: () => userBloc,
-      act:
-          (bloc) => bloc.add(
-            UpdateUsernameEvent(
-              newUsername: tNewUsername,
-              userId: tUser.userId!,
-            ),
-          ),
-      expect:
-          () => [
-            UserState(userStatus: UserStatus.loading),
-            UserState(userStatus: UserStatus.usernameUpdated),
+            UserState(userStatus: UserStatus.userProfileUpdated),
           ],
     );
   });

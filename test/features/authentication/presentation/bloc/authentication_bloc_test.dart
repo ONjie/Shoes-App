@@ -22,8 +22,7 @@ class MockAuthState extends Mock implements CheckAuthState {}
 
 class MockResetPassword extends Mock implements ResetPassword {}
 
-class MockSendResetPasswordOTP extends Mock
-    implements SendResetPasswordOTP {}
+class MockSendResetPasswordOTP extends Mock implements SendResetPasswordOTP {}
 
 void main() {
   late AuthenticationBloc authenticationBloc;
@@ -157,7 +156,7 @@ void main() {
 
   group('_onSignOut', () {
     blocTest(
-      'Should emit [AuthenticationStatus.loading, AuthenticationStatus.signOutSuccess] when successful',
+      'Should emit [AuthenticationStatus.signOutSuccess] when successful',
       setUp: () {
         when(
           () => mockSignOut.execute(),
@@ -168,28 +167,22 @@ void main() {
       expect:
           () => <AuthenticationState>[
             const AuthenticationState(
-              authenticationStatus: AuthenticationStatus.loading,
-            ),
-            const AuthenticationState(
               authenticationStatus: AuthenticationStatus.signOutSuccess,
             ),
           ],
     );
 
     blocTest(
-      'Should emit [AuthenticationStatus.loading, AuthenticationStatus.signOutError] when there is not internet connection',
+      'Should emit [AuthenticationStatus.signOutError] when there is not internet connection',
       setUp: () {
         when(() => mockSignOut.execute()).thenAnswer(
-          (_) async => const Left(InternetConnectionFailure(message: 'Error')),
+          (_) async => const Left(SupabaseAuthFailure(message: 'Error')),
         );
       },
       build: () => authenticationBloc,
       act: (bloc) => authenticationBloc.add(SignOutEvent()),
       expect:
           () => <AuthenticationState>[
-            const AuthenticationState(
-              authenticationStatus: AuthenticationStatus.loading,
-            ),
             const AuthenticationState(
               authenticationStatus: AuthenticationStatus.signOutError,
               message: 'Error',
@@ -267,7 +260,7 @@ void main() {
 
   group('_sendResetPasswordOTP', () {
     blocTest(
-      'should emit[AuthenticationStatus.loading, AuthenticationStatus.resetPasswordOTPSent] when otp is sent',
+      'should emit[ AuthenticationStatus.loading, AuthenticationStatus.resetPasswordOTPSent] when otp is sent',
       setUp: () {
         when(
           () => mockSendResetPasswordOTP.execute(email: any(named: 'email')),
@@ -280,7 +273,7 @@ void main() {
           ),
       expect:
           () => <AuthenticationState>[
-            const AuthenticationState(
+             AuthenticationState(
               authenticationStatus: AuthenticationStatus.loading,
             ),
             AuthenticationState(
@@ -291,7 +284,7 @@ void main() {
     );
 
     blocTest(
-      'should emit[AuthenticationStatus.loading, AuthenticationStatus.resetPasswordOTPError] when unsuccessful',
+      'should emit[ AuthenticationStatus.loading, AuthenticationStatus.sendResetPasswordOTPError] when unsuccessful',
       setUp: () {
         when(
           () => mockSendResetPasswordOTP.execute(email: any(named: 'email')),
@@ -307,17 +300,19 @@ void main() {
       expect:
           () => <AuthenticationState>[
             const AuthenticationState(
-              authenticationStatus: AuthenticationStatus.loading,
+              authenticationStatus:
+                  AuthenticationStatus.loading,
             ),
             const AuthenticationState(
-              authenticationStatus: AuthenticationStatus.resetPasswordOTPError,
+              authenticationStatus:
+                  AuthenticationStatus.sendResetPasswordOTPError,
               message: 'Error',
             ),
           ],
     );
   });
 
-   group('_resetPassword', () {
+  group('_resetPassword', () {
     blocTest(
       'should emit[AuthenticationStatus.loading, AuthenticationStatus.resetPasswordSuccess] when otp is sent',
       setUp: () {
@@ -345,6 +340,7 @@ void main() {
             ),
             const AuthenticationState(
               authenticationStatus: AuthenticationStatus.resetPasswordSuccess,
+              message: 'Your password has been change successfully.',
             ),
           ],
     );

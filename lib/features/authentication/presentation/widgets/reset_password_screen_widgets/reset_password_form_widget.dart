@@ -7,7 +7,9 @@ import '../../bloc/authentication_bloc.dart';
 import '../authentication_alert_dialog_widget.dart';
 
 class ResetPasswordFormWidget extends StatefulWidget {
-  const ResetPasswordFormWidget({super.key});
+  const ResetPasswordFormWidget({super.key, required this.sizedBoxHeight});
+
+  final double sizedBoxHeight;
 
   @override
   State<ResetPasswordFormWidget> createState() =>
@@ -21,8 +23,8 @@ class _ResetPasswordFormWidgetState extends State<ResetPasswordFormWidget> {
   late String newPassword = "";
   late String confirmNewPassword = "";
 
-   bool _obscureText = false;
-   bool _obscureTextTwo = false;
+  bool _obscureText = false;
+  bool _obscureTextTwo = false;
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +35,7 @@ class _ResetPasswordFormWidgetState extends State<ResetPasswordFormWidget> {
           key: _formKey,
           child: Column(
             children: [
-              SizedBox(height: MediaQuery.of(context).size.height * 0.1),
+              SizedBox(height: widget.sizedBoxHeight),
               buildOTPCodeTextFormField(),
               SizedBox(height: 16),
               buildEmailTextFormField(),
@@ -148,7 +150,7 @@ class _ResetPasswordFormWidgetState extends State<ResetPasswordFormWidget> {
           hintTextColor: Theme.of(
             context,
           ).colorScheme.secondary.withValues(alpha: 0.8),
-          hintText: 'Password',
+          hintText: 'New Password',
           showSuffixIcon: true,
           suffixIcon: IconButton(
             onPressed: () {
@@ -204,7 +206,7 @@ class _ResetPasswordFormWidgetState extends State<ResetPasswordFormWidget> {
           hintTextColor: Theme.of(
             context,
           ).colorScheme.secondary.withValues(alpha: 0.8),
-          hintText: 'Confirm Password',
+          hintText: 'Confirm New Password',
           showSuffixIcon: true,
           suffixIcon: IconButton(
             onPressed: () {
@@ -240,8 +242,7 @@ class _ResetPasswordFormWidgetState extends State<ResetPasswordFormWidget> {
     );
   }
 
-  
-Widget buildResetPasswordButton() {
+  Widget buildResetPasswordButton() {
     return ElevatedButtonWidget(
       buttonText: resetPasswordText,
       textColor: Theme.of(context).colorScheme.surface,
@@ -255,16 +256,16 @@ Widget buildResetPasswordButton() {
       padding: const EdgeInsets.all(12),
       onPressed: () async {
         if (_formKey.currentState!.validate()) {
-          BlocProvider.of<AuthenticationBloc>(
-            context,
-          ).add(ResetPasswordEvent(email: email, otp: otp, newPassword: newPassword));
+          BlocProvider.of<AuthenticationBloc>(context).add(
+            ResetPasswordEvent(
+              email: email,
+              otp: otp,
+              newPassword: newPassword,
+            ),
+          );
           await authenticationAlertDialogWidget(context: context);
         }
       },
     );
   }
-
-
-
-
 }

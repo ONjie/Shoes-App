@@ -20,6 +20,12 @@ import 'package:shoes_app/features/shoes/data/data_sources/remote_data/shoes_api
 import 'package:shoes_app/features/shoes/data/repositories/shoes_repository_impl.dart';
 import 'package:shoes_app/features/shoes/domain/repositories/shoes_repository.dart';
 import 'package:shoes_app/features/shoes/presentation/bloc/shoes_bloc.dart';
+import 'package:shoes_app/features/user/data/data_sources/remote_data/user_remote_database_service.dart';
+import 'package:shoes_app/features/user/data/repositories/user_repository_impl.dart';
+import 'package:shoes_app/features/user/domain/repositories/user_repository.dart';
+import 'package:shoes_app/features/user/domain/use_cases/fetch_user.dart';
+import 'package:shoes_app/features/user/domain/use_cases/update_user_profile.dart';
+import 'package:shoes_app/features/user/presentation/bloc/user_bloc.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'features/authentication/domain/use_cases/reset_password.dart';
@@ -70,6 +76,14 @@ Future<void> init() async {
       deleteCartItems: locator(),
       fetchCartItems: locator(),
       updateCartItemQuantity: locator(),
+    ),
+  );
+
+  //user bloc
+  locator.registerFactory(
+    () => UserBloc(
+      fetchUser: locator(),
+      updateUserProfile: locator()
     ),
   );
 
@@ -148,6 +162,12 @@ Future<void> init() async {
     () => FetchCartItems(cartRepository: locator()),
   );
 
+  // user use_cases
+  locator.registerLazySingleton(() => FetchUser(userRepository: locator()));
+  locator.registerLazySingleton(
+    () => UpdateUserProfile(userRepository: locator()),
+  );
+
   //registering repositories
 
   //authentication repository
@@ -170,6 +190,14 @@ Future<void> init() async {
   //cart repository
   locator.registerLazySingleton<CartRepository>(
     () => CartRepositoryImpl(cartLocalDatabaseService: locator()),
+  );
+
+  // user repository
+  locator.registerLazySingleton<UserRepository>(
+    () => UserRepositoryImpl(
+      networkInfo: locator(),
+      userRemoteDatabaseService: locator(),
+    ),
   );
 
   //registering dataSources
@@ -195,6 +223,10 @@ Future<void> init() async {
     () => CartLocalDatabaseServiceImpl(appDatabase: locator()),
   );
 
+  //user dataosurces
+  locator.registerLazySingleton<UserRemoteDatabaseService>(
+    () => UserRemoteDatabaseServiceImpl(supabaseClient: locator()),
+  );
 
   //registering SupabaseClient
   final supabaseClient = Supabase.instance.client;

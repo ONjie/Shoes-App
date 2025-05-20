@@ -102,12 +102,6 @@ class AuthenticationBloc
   }
 
   _onSignOut(SignOutEvent event, Emitter<AuthenticationState> emit) async {
-    emit(
-      const AuthenticationState(
-        authenticationStatus: AuthenticationStatus.loading,
-      ),
-    );
-
     final isRightOrFailure = await signOut.execute();
 
     isRightOrFailure.fold(
@@ -166,9 +160,7 @@ class AuthenticationBloc
     Emitter<AuthenticationState> emit,
   ) async {
     emit(
-      const AuthenticationState(
-        authenticationStatus: AuthenticationStatus.loading,
-      ),
+      AuthenticationState(authenticationStatus: AuthenticationStatus.loading),
     );
 
     final isRightOrFailure = await sendResetPasswordOTP.execute(
@@ -179,14 +171,15 @@ class AuthenticationBloc
       (failure) {
         emit(
           AuthenticationState(
-            authenticationStatus: AuthenticationStatus.resetPasswordOTPError,
+            authenticationStatus:
+                AuthenticationStatus.sendResetPasswordOTPError,
             message: mapFailureToMessage(failure: failure),
           ),
         );
       },
       (isRight) {
         emit(
-           AuthenticationState(
+          AuthenticationState(
             authenticationStatus: AuthenticationStatus.resetPasswordOTPSent,
             message: otpCodeSentText,
           ),
@@ -224,10 +217,10 @@ class AuthenticationBloc
         emit(
           const AuthenticationState(
             authenticationStatus: AuthenticationStatus.resetPasswordSuccess,
+            message: 'Your password has been change successfully.',
           ),
         );
       },
     );
   }
-
 }
