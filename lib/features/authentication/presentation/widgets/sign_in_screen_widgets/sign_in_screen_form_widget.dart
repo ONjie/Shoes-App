@@ -148,7 +148,7 @@ class _SignInScreenFormWidgetState extends State<SignInScreenFormWidget> {
       children: [
         TextButton(
           onPressed: () {
-            context.go('/reset_password');
+            context.go('/forgot_password');
           },
           child: Text(
             'Forgot password?',

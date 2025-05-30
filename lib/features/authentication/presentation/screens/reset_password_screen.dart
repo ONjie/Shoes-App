@@ -3,10 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shoes_app/features/authentication/presentation/widgets/reset_password_screen_widgets/reset_password_form_widget.dart';
-
-
 import '../bloc/authentication_bloc.dart';
-import '../widgets/reset_password_screen_widgets/send_otp_code_form_widget.dart';
+
 class ResetPasswordScreen extends StatefulWidget {
   const ResetPasswordScreen({super.key});
 
@@ -61,22 +59,14 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
           scrollDirection: Axis.vertical,
           child: Padding(
             padding: const EdgeInsets.fromLTRB(12, 16, 12, 0),
-            child: BlocConsumer<AuthenticationBloc, AuthenticationState>(
-              builder: (context, state) {
-                if (state.authenticationStatus ==
-                    AuthenticationStatus.resetPasswordOTPSent) {
-                  Navigator.pop(context);
-                  return ResetPasswordFormWidget(sizedBoxHeight:  MediaQuery.of(context).size.height * 0.1,);
-                }
-                return SendOtpCodeFormWidget();
-              },
+            child: BlocListener<AuthenticationBloc, AuthenticationState>(
               listener: (context, state){
                 if(state.authenticationStatus == AuthenticationStatus.resetPasswordSuccess){
                   Navigator.pop(context);
                   context.go('/sign_in');
-
                 }
               },
+              child: ResetPasswordFormWidget(sizedBoxHeight: MediaQuery.of(context).size.height * 0.1,),
             ),
           ),
         ),

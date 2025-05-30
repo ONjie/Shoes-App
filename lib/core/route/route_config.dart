@@ -11,6 +11,7 @@ import 'package:shoes_app/features/user/domain/entities/user_entity.dart';
 import 'package:shoes_app/features/user/presentation/screens/edit_profile_screen.dart';
 
 import '../../features/authentication/presentation/screens/change_password_screen.dart';
+import '../../features/authentication/presentation/screens/forgot_password_screen.dart';
 
 final router = GoRouter(
   initialLocation: '/',
@@ -37,6 +38,11 @@ final router = GoRouter(
       name: 'SignUp Screen',
       path: '/sign_up',
       builder: (context, state) => SignUpScreen(),
+    ),
+     GoRoute(
+      name: 'Forgot Password Screen',
+      path: '/forgot_password',
+      builder: (context, state) => ForgotPasswordScreen(),
     ),
     GoRoute(
       name: 'Reset Password Screen',

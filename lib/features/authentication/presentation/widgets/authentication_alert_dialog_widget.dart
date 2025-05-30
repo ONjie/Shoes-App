@@ -81,8 +81,8 @@ Widget displaySuccessOrErrorMessage({
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Image.asset(
-            'assets/images/no_internet.png',
-            color: Colors.red,
+            'assets/icons/no_internet.png',
+            color: Theme.of(context).colorScheme.error,
             width: 70,
           ),
           const SizedBox(height: 5),

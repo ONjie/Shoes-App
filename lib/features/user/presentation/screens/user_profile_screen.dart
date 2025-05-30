@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:shoes_app/core/core.dart';
-
-import '../bloc/user_bloc.dart';
+import '../../../authentication/presentation/bloc/authentication_bloc.dart';
 import '../widgets/user_profile_screen_widget/user_details_widget.dart';
 import '../widgets/user_profile_screen_widget/user_profile_list_view_widget.dart';
 
@@ -14,12 +14,6 @@ class UserProfileScreen extends StatefulWidget {
 }
 
 class _UserProfileScreenState extends State<UserProfileScreen> {
-  @override
-  void initState() {
-    BlocProvider.of<UserBloc>(context).add(FetchUserEvent());
-    super.initState();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -36,7 +30,9 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       elevation: 0,
       actions: [
         IconButton(
-          onPressed: () {},
+          onPressed: () {
+            BlocProvider.of<AuthenticationBloc>(context).add(SignOutEvent());
+          },
           icon: Icon(
             Icons.logout_rounded,
             size: 30,
@@ -57,32 +53,29 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         width: screenWidth,
         child: Padding(
           padding: EdgeInsets.fromLTRB(12, 16, 12, 0),
-          child: BlocBuilder<UserBloc, UserState>(
-            builder: (context, state) {
-              if (state.userStatus == UserStatus.loading) {
-                return Center(
-                  child: CircularProgressIndicator(
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
+          child: BlocListener<AuthenticationBloc, AuthenticationState>(
+            listener: (context, state) {
+              if (state.authenticationStatus ==
+                  AuthenticationStatus.signOutSuccess) {
+                context.go('/sign_in');
+              }
+              if (state.authenticationStatus ==
+                  AuthenticationStatus.signOutError) {
+                snackBarWidget(
+                  context: context,
+                  message: state.message!,
+                  bgColor: Theme.of(context).colorScheme.error,
+                  duration: 3,
                 );
               }
-
-              if (state.userStatus == UserStatus.userFetched) {
-                return Column(
-                  children: [
-                    UserDetailsWidget(user: state.user!),
-                    const SizedBox(height: 40),
-                    UserProfileListViewWidget(user: state.user!),
-                  ],
-                );
-              }
-
-              if (state.userStatus == UserStatus.fetchUserError) {
-                return ErrorStateWidget(message: state.errorMessage!);
-              }
-
-              return Container();
             },
+            child: Column(
+              children: [
+                UserDetailsWidget(),
+                const SizedBox(height: 40),
+                UserProfileListViewWidget(),
+              ],
+            ),
           ),
         ),
       ),

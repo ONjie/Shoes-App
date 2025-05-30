@@ -1,0 +1,21 @@
+[
+    {
+        "id": 1,
+        "name": "name",
+        "country": "country",
+        "contact_number": "contactNumber",
+        "city": "city",
+        "google_plus_code": "googlePlusCode",
+        "updated_at": "2025-05-22T00:00:00.000"
+    },
+    {
+        "id": 2,
+        "name": "name",
+        "country": "country",
+        "contact_number": "contact_number",
+        "city": "city",
+        "google_plus_code": "googlePlusCode",
+        "updated_at": "2025-05-22T00:00:00.000"
+    }
+   
+]

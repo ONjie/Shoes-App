@@ -2,14 +2,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:shoes_app/features/user/domain/entities/user_entity.dart';
 
-import '../../../../authentication/presentation/bloc/authentication_bloc.dart';
+import '../../bloc/user_bloc.dart';
 
 class UserProfileListViewWidget extends StatefulWidget {
-  const UserProfileListViewWidget({super.key, required this.user});
-
-  final UserEntity user;
+  const UserProfileListViewWidget({super.key});
 
   @override
   State<UserProfileListViewWidget> createState() =>
@@ -17,15 +14,17 @@ class UserProfileListViewWidget extends StatefulWidget {
 }
 
 class _UserProfileListViewWidgetState extends State<UserProfileListViewWidget> {
+  late String email = '';
+
   @override
   Widget build(BuildContext context) {
-    return BlocListener<AuthenticationBloc, AuthenticationState>(
+    return BlocListener<UserBloc, UserState>(
       listener: (context, state) {
-        if (state.authenticationStatus == AuthenticationStatus.success) {
-          // Navigator.push(context, MaterialPageRoute(builder: (context) => const SignInScreen()));
+        if (state.userStatus == UserStatus.userFetched) {
+          setState(() {
+            email = state.user!.email;
+          });
         }
-        if (state.authenticationStatus ==
-            AuthenticationStatus.noInternetConnection) {}
       },
       child: Column(
         children: [
@@ -33,13 +32,13 @@ class _UserProfileListViewWidgetState extends State<UserProfileListViewWidget> {
             icon: Icons.lock,
             title: 'Change Password',
             navigateToScreen: () {
-              context.go('/change_password/${widget.user.email}');
+              context.go('/change_password/$email');
             },
           ),
           const SizedBox(height: 16),
           buildListTileWidget(
             icon: CupertinoIcons.location_solid,
-            title: 'Delivery Destination',
+            title: 'Delivery Destinations',
             navigateToScreen: () {},
           ),
           const SizedBox(height: 16),

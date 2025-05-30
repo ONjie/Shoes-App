@@ -18,11 +18,9 @@ class UserBloc extends Bloc<UserEvent, UserState> {
     : super(UserState(userStatus: UserStatus.initial)) {
     on<FetchUserEvent>(_onFetchUser);
     on<UpdateUserProfileEvent>(_onUpdateUserProfile);
-    // on<UpdateUsernameEvent>(_onUpdateUsername);
   }
 
   _onFetchUser(FetchUserEvent event, Emitter<UserState> emit) async {
-    emit(UserState(userStatus: UserStatus.loading));
 
     final userOrFailure = await fetchUser.call();
 

@@ -40,7 +40,7 @@ void main() {
 
   group('_onFetchUser', () {
     blocTest(
-      'should emit [UserStatus.loading, UserStatus.fetchUserError] when call is unsuccessful',
+      'should emit [UserStatus.fetchUserError] when call is unsuccessful',
       setUp: () {
         when(() => mockFetchUser.call()).thenAnswer(
           (_) async =>
@@ -51,7 +51,6 @@ void main() {
       act: (bloc) => bloc.add(FetchUserEvent()),
       expect:
           () => [
-            UserState(userStatus: UserStatus.loading),
             UserState(
               userStatus: UserStatus.fetchUserError,
               errorMessage: 'Failed to fetch user',
@@ -60,7 +59,7 @@ void main() {
     );
 
     blocTest(
-      'should emit [UserStatus.loading, UserStatus.userFetched] when call is successful',
+      'should emit [UserStatus.userFetched] when call is successful',
       setUp: () {
         when(() => mockFetchUser.call()).thenAnswer((_) async => Right(tUser));
       },
@@ -68,7 +67,6 @@ void main() {
       act: (bloc) => bloc.add(FetchUserEvent()),
       expect:
           () => [
-            UserState(userStatus: UserStatus.loading),
             UserState(userStatus: UserStatus.userFetched, user: tUser),
           ],
     );
