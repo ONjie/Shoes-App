@@ -39,7 +39,9 @@ class _UserProfileListViewWidgetState extends State<UserProfileListViewWidget> {
           buildListTileWidget(
             icon: CupertinoIcons.location_solid,
             title: 'Delivery Destinations',
-            navigateToScreen: () {},
+            navigateToScreen: () {
+              context.go('/delivery_destinations');
+            },
           ),
           const SizedBox(height: 16),
           buildListTileWidget(

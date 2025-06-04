@@ -134,7 +134,7 @@ void main() {
 
   group('_onFetchDeliveryDestinations', () {
     blocTest(
-      'should emit [DeliveryDestinationStatus.loading, DeliveryDestinationStatus.fetchDeliveryDestinationsError] when call is unsuccessful',
+      'should emit [DeliveryDestinationStatus.fetchDeliveryDestinationsError] when call is unsuccessful',
       setUp: () {
         when(() => mockFetchDeliveryDestinations.call()).thenAnswer(
           (_) async => Left(
@@ -151,9 +151,6 @@ void main() {
       expect:
           () => <DeliveryDestinationState>[
             DeliveryDestinationState(
-              deliveryDestinationStatus: DeliveryDestinationStatus.loading,
-            ),
-            DeliveryDestinationState(
               deliveryDestinationStatus:
                   DeliveryDestinationStatus.fetchDeliveryDestinationsError,
               message: 'Failed to fetch delivery destinations',
@@ -162,7 +159,7 @@ void main() {
     );
 
     blocTest(
-      'should emit [DeliveryDestinationStatus.loading, DeliveryDestinationStatus.deliveryDestinationsFetched] when call is successful',
+      'should emit [ DeliveryDestinationStatus.deliveryDestinationsFetched] when call is successful',
       setUp: () {
         when(
           () => mockFetchDeliveryDestinations.call(),
@@ -174,9 +171,6 @@ void main() {
               deliveryDestinationBloc.add(FetchDeliveryDestinationsEvent()),
       expect:
           () => <DeliveryDestinationState>[
-            DeliveryDestinationState(
-              deliveryDestinationStatus: DeliveryDestinationStatus.loading,
-            ),
             DeliveryDestinationState(
               deliveryDestinationStatus:
                   DeliveryDestinationStatus.deliveryDestinationsFetched,

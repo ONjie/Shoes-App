@@ -15,6 +15,11 @@ import 'package:shoes_app/features/cart/data/data_sources/local_data/cart_local_
 import 'package:shoes_app/features/cart/data/repositories/cart_repository_impl.dart';
 import 'package:shoes_app/features/cart/domain/repositories/cart_repository.dart';
 import 'package:shoes_app/features/cart/domain/use_cases/use_cases.dart';
+import 'package:shoes_app/features/delivery_destination/data/data_sources/remote_data/delivery_destination_remote_database_service.dart';
+import 'package:shoes_app/features/delivery_destination/data/repositories/delivery_destination_repository_impl.dart';
+import 'package:shoes_app/features/delivery_destination/domain/repositories/delivery_destination_repository.dart';
+import 'package:shoes_app/features/delivery_destination/domain/use_cases/add_delivery_destination.dart';
+import 'package:shoes_app/features/delivery_destination/presentation/bloc/delivery_destination_bloc.dart';
 import 'package:shoes_app/features/shoes/data/data_sources/local_data/shoes_local_database_service.dart';
 import 'package:shoes_app/features/shoes/data/data_sources/remote_data/shoes_api_service.dart';
 import 'package:shoes_app/features/shoes/data/repositories/shoes_repository_impl.dart';
@@ -30,6 +35,10 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'features/authentication/domain/use_cases/reset_password.dart';
 import 'features/cart/presentation/bloc/cart_bloc.dart';
+import 'features/delivery_destination/domain/use_cases/delete_delivery_destination.dart';
+import 'features/delivery_destination/domain/use_cases/fetch_delivery_destination.dart';
+import 'features/delivery_destination/domain/use_cases/fetch_delivery_destinations.dart';
+import 'features/delivery_destination/domain/use_cases/update_delivery_destination.dart';
 import 'features/shoes/domain/use_cases/use_cases.dart';
 
 final locator = GetIt.instance;
@@ -81,9 +90,17 @@ Future<void> init() async {
 
   //user bloc
   locator.registerFactory(
-    () => UserBloc(
-      fetchUser: locator(),
-      updateUserProfile: locator()
+    () => UserBloc(fetchUser: locator(), updateUserProfile: locator()),
+  );
+
+  //delivery destionation bloc
+  locator.registerFactory(
+    () => DeliveryDestinationBloc(
+      addDeliveryDestination: locator(),
+      fetchDeliveryDestinations: locator(),
+      fetchDeliveryDestination: locator(),
+      updateDeliveryDestination: locator(),
+      deleteDeliveryDestination: locator(),
     ),
   );
 
@@ -168,6 +185,23 @@ Future<void> init() async {
     () => UpdateUserProfile(userRepository: locator()),
   );
 
+  // delivery destination use_cases
+  locator.registerLazySingleton(
+    () => AddDeliveryDestination(deliveryDestinationRepository: locator()),
+  );
+  locator.registerLazySingleton(
+    () => FetchDeliveryDestinations(deliveryDestinationRepository: locator()),
+  );
+  locator.registerLazySingleton(
+    () => FetchDeliveryDestination(deliveryDestinationRepository: locator()),
+  );
+  locator.registerLazySingleton(
+    () => UpdateDeliveryDestination(deliveryDestinationRepository: locator()),
+  );
+  locator.registerLazySingleton(
+    () => DeleteDeliveryDestination(deliveryDestinationRepository: locator()),
+  );
+
   //registering repositories
 
   //authentication repository
@@ -200,6 +234,14 @@ Future<void> init() async {
     ),
   );
 
+  // delivery destination repository
+  locator.registerLazySingleton<DeliveryDestinationRepository>(
+    () => DeliveryDestinationRepositoryImpl(
+      deliveryDestinationRemoteDatabaseService: locator(),
+      networkInfo: locator(),
+    ),
+  );
+
   //registering dataSources
   // authentication datasource
   locator.registerLazySingleton<SupabaseAuthService>(
@@ -226,6 +268,12 @@ Future<void> init() async {
   //user dataosurces
   locator.registerLazySingleton<UserRemoteDatabaseService>(
     () => UserRemoteDatabaseServiceImpl(supabaseClient: locator()),
+  );
+
+  // delivery destination datasources
+  locator.registerLazySingleton<DeliveryDestinationRemoteDatabaseService>(
+    () =>
+        DeliveryDestinationRemoteDatabaseServiceImpl(supabaseClient: locator()),
   );
 
   //registering SupabaseClient

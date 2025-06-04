@@ -1,4 +1,7 @@
 import 'package:go_router/go_router.dart';
+import 'package:shoes_app/features/delivery_destination/domain/entities/delivery_destination_entity.dart';
+import 'package:shoes_app/features/delivery_destination/presentation/screens/add_delivery_destination_screen.dart';
+import 'package:shoes_app/features/delivery_destination/presentation/screens/edit_delivery_destination_screen.dart';
 import 'package:shoes_app/features/shoes/presentation/screens/brands_screen.dart';
 import 'package:shoes_app/features/shoes/presentation/screens/home_screen.dart';
 import 'package:shoes_app/features/authentication/presentation/screens/reset_password_screen.dart';
@@ -12,6 +15,7 @@ import 'package:shoes_app/features/user/presentation/screens/edit_profile_screen
 
 import '../../features/authentication/presentation/screens/change_password_screen.dart';
 import '../../features/authentication/presentation/screens/forgot_password_screen.dart';
+import '../../features/delivery_destination/presentation/screens/delivery_destinations_screen.dart';
 
 final router = GoRouter(
   initialLocation: '/',
@@ -39,7 +43,7 @@ final router = GoRouter(
       path: '/sign_up',
       builder: (context, state) => SignUpScreen(),
     ),
-     GoRoute(
+    GoRoute(
       name: 'Forgot Password Screen',
       path: '/forgot_password',
       builder: (context, state) => ForgotPasswordScreen(),
@@ -84,6 +88,26 @@ final router = GoRouter(
       builder: (context, state) {
         final email = state.pathParameters['email'];
         return ChangePasswordScreen(email: email!);
+      },
+    ),
+    GoRoute(
+      name: 'Delviery Destination Screen',
+      path: '/delivery_destinations',
+      builder: (context, state) => DeliveryDestinationsScreen(),
+    ),
+    GoRoute(
+      name: 'Add Delviery Destination Screen',
+      path: '/add_delivery_destination',
+      builder: (context, state) => AddDeliveryDestinationScreen(),
+    ),
+    GoRoute(
+      name: 'Edit Delviery Destination Screen',
+      path: '/edit_delivery_destination',
+      builder: (context, state) {
+        final deliveryDestination = state.extra as DeliveryDestinationEntity;
+        return EditDeliveryDestinationScreen(
+          deliveryDestination: deliveryDestination,
+        );
       },
     ),
   ],

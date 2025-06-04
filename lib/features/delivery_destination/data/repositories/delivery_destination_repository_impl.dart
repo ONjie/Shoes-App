@@ -107,6 +107,8 @@ class DeliveryDestinationRepositoryImpl
       return Right(deliveryDestinations);
     } on SupabaseDatabaseException catch (e) {
       return Left(SupabaseDatabaseFailure(message: e.message));
+    } on OtherExceptions catch (e) {
+      return Left(OtherFailure(message: e.message));
     }
   }
 

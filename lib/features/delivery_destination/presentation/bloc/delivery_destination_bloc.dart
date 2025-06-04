@@ -76,14 +76,10 @@ class DeliveryDestinationBloc
     FetchDeliveryDestinationsEvent event,
     Emitter<DeliveryDestinationState> emit,
   ) async {
-    emit(
-      DeliveryDestinationState(
-        deliveryDestinationStatus: DeliveryDestinationStatus.loading,
-      ),
-    );
+  
 
     final deliveryDestinationsOrFailure =
-        await fetchDeliveryDestinations.call();
+          await fetchDeliveryDestinations.call();
 
     deliveryDestinationsOrFailure.fold(
       (failure) {

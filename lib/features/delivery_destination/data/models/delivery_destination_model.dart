@@ -12,6 +12,7 @@ class DeliveryDestinationModel extends Equatable {
     required this.contactNumber,
     required this.googlePlusCode,
     this.updatedAt,
+    this.createdAt
   });
 
   final int? id;
@@ -21,6 +22,7 @@ class DeliveryDestinationModel extends Equatable {
   final String googlePlusCode;
   final String contactNumber;
   final DateTime? updatedAt;
+  final DateTime? createdAt;
 
   DeliveryDestinationModel copyWith({
     final int? id,
@@ -30,6 +32,7 @@ class DeliveryDestinationModel extends Equatable {
     final String? googlePlusCode,
     final String? contactNumber,
     final DateTime? updatedAt,
+    final DateTime? createdAt
   }) => DeliveryDestinationModel(
     id: id ?? this.id,
     country: country ?? this.city,
@@ -38,6 +41,7 @@ class DeliveryDestinationModel extends Equatable {
     contactNumber: contactNumber ?? this.contactNumber,
     googlePlusCode: googlePlusCode ?? this.googlePlusCode,
     updatedAt: updatedAt ?? this.updatedAt,
+    createdAt: createdAt ?? this.createdAt
   );
 
   static DeliveryDestinationModel fromJson(MapJson json) =>
@@ -49,6 +53,7 @@ class DeliveryDestinationModel extends Equatable {
         contactNumber: json['contact_number'] as String,
         googlePlusCode: json['google_plus_code'] as String,
         updatedAt: DateTime.parse(json['updated_at']),
+        createdAt: DateTime.parse(json['created_at'])
       );
 
   MapJson toJson() {
@@ -60,6 +65,7 @@ class DeliveryDestinationModel extends Equatable {
       'contact_number': contactNumber,
       'google_plus_code': googlePlusCode,
       'updated_at': updatedAt?.toIso8601String(),
+      'created_at': createdAt?.toIso8601String()
     };
   }
 
@@ -71,6 +77,7 @@ class DeliveryDestinationModel extends Equatable {
         name: name,
         contactNumber: contactNumber,
         googlePlusCode: googlePlusCode,
+        createdAt: createdAt
       );
 
   @override
@@ -82,5 +89,6 @@ class DeliveryDestinationModel extends Equatable {
     country,
     googlePlusCode,
     updatedAt,
+    createdAt
   ];
 }

@@ -41,8 +41,8 @@ class DeliveryDestinationRemoteDatabaseServiceImpl
         'name': deliveryDestination.name,
         'contact_number': deliveryDestination.contactNumber,
         'google_plus_code': deliveryDestination.googlePlusCode,
-        'created_at': DateTime.now(),
-        'updated_at': DateTime.now(),
+        'created_at': DateTime.now().toIso8601String(),
+        'updated_at': DateTime.now().toIso8601String(),
       });
     } catch (e) {
       throw SupabaseDatabaseException(message: e.toString());
@@ -97,12 +97,21 @@ class DeliveryDestinationRemoteDatabaseServiceImpl
           .select()
           .filter('user_id', 'eq', userId);
 
+      if (results.isEmpty) {
+        throw SupabaseDatabaseException(
+          message: 'No delivery destinations found',
+        );
+      }
+
       final deliveryDestinations =
           results.map((e) => DeliveryDestinationModel.fromJson(e)).toList();
 
       return deliveryDestinations;
     } catch (e) {
-      throw SupabaseDatabaseException(message: e.toString());
+      if (e is SupabaseDatabaseException) {
+        rethrow;
+      }
+      throw OtherExceptions(message: e.toString());
     }
   }
 
