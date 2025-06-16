@@ -26,3 +26,4 @@ export 'utils/common_widgets/delivery_charge_row_widget.dart';
 export 'utils/common_widgets/dismissible_background_widget.dart';
 export 'permissions/gallery_permission.dart';
 export 'utils/common_widgets/profile_picture_widget.dart';
+export 'utils/api_endpoints/stripe_payment_intent_endpoint.dart';

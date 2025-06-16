@@ -1,0 +1,18 @@
+[
+    {
+        "title": "title",
+        "image": "image",
+        "color": "color",
+        "price": 100.00,
+        "size": 10,
+        "quantity": 1
+        },
+         {
+        "title": "title",
+        "image": "image",
+        "color": "color",
+        "size": 12,
+        "price": 100.00,
+        "quantity": 2
+        }
+]

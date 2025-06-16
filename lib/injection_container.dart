@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:get_it/get_it.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:shoes_app/core/core.dart';
@@ -15,6 +16,10 @@ import 'package:shoes_app/features/cart/data/data_sources/local_data/cart_local_
 import 'package:shoes_app/features/cart/data/repositories/cart_repository_impl.dart';
 import 'package:shoes_app/features/cart/domain/repositories/cart_repository.dart';
 import 'package:shoes_app/features/cart/domain/use_cases/use_cases.dart';
+import 'package:shoes_app/features/checkout/data/data_sources/remote_data/stripe_payment_service.dart';
+import 'package:shoes_app/features/checkout/data/repositories/checkout_repository_impl.dart';
+import 'package:shoes_app/features/checkout/domain/repositories/checkout_repository.dart';
+import 'package:shoes_app/features/checkout/presentation/bloc/checkout_bloc.dart';
 import 'package:shoes_app/features/delivery_destination/data/data_sources/remote_data/delivery_destination_remote_database_service.dart';
 import 'package:shoes_app/features/delivery_destination/data/repositories/delivery_destination_repository_impl.dart';
 import 'package:shoes_app/features/delivery_destination/domain/repositories/delivery_destination_repository.dart';
@@ -35,6 +40,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'features/authentication/domain/use_cases/reset_password.dart';
 import 'features/cart/presentation/bloc/cart_bloc.dart';
+import 'features/checkout/domain/use_cases/make_payment.dart';
 import 'features/delivery_destination/domain/use_cases/delete_delivery_destination.dart';
 import 'features/delivery_destination/domain/use_cases/fetch_delivery_destination.dart';
 import 'features/delivery_destination/domain/use_cases/fetch_delivery_destinations.dart';
@@ -103,6 +109,9 @@ Future<void> init() async {
       deleteDeliveryDestination: locator(),
     ),
   );
+
+  //checkout bloc
+  locator.registerFactory(() => CheckoutBloc(makePayment: locator()));
 
   //registering use_cases
   // authentication use_cases
@@ -202,6 +211,11 @@ Future<void> init() async {
     () => DeleteDeliveryDestination(deliveryDestinationRepository: locator()),
   );
 
+  // checkout use_cases
+  locator.registerLazySingleton(
+    () => MakePayment(checkoutRepository: locator()),
+  );
+
   //registering repositories
 
   //authentication repository
@@ -242,6 +256,14 @@ Future<void> init() async {
     ),
   );
 
+  // checkout repository
+  locator.registerLazySingleton<CheckoutRepository>(
+    () => CheckoutRepositoryImpl(
+      stripePaymentService: locator(),
+      networkInfo: locator(),
+    ),
+  );
+
   //registering dataSources
   // authentication datasource
   locator.registerLazySingleton<SupabaseAuthService>(
@@ -276,6 +298,11 @@ Future<void> init() async {
         DeliveryDestinationRemoteDatabaseServiceImpl(supabaseClient: locator()),
   );
 
+  // checkout datasources
+  locator.registerLazySingleton<StripePaymentService>(
+    () => StripePaymentServiceImpl(dio: locator(), stripe: locator()),
+  );
+
   //registering SupabaseClient
   final supabaseClient = Supabase.instance.client;
   locator.registerLazySingleton(() => supabaseClient);
@@ -297,4 +324,8 @@ Future<void> init() async {
   //registering Drift's AppDatabase
   final appDatabase = AppDatabase();
   locator.registerLazySingleton(() => appDatabase);
+
+  // registering Stripe
+  final stripe = Stripe.instance;
+  locator.registerLazySingleton(() => stripe);
 }

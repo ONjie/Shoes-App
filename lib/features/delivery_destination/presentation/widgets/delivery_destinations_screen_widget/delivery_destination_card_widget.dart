@@ -87,17 +87,19 @@ class DeliveryDestinationCardWidget extends StatelessWidget {
                     : Theme.of(context).colorScheme.secondary,
           ),
         ),
-        isSelected ? IconButton(
-          icon: Icon(CupertinoIcons.delete),
-          color: Theme.of(context).colorScheme.error,
-          onPressed: () {
-            BlocProvider.of<DeliveryDestinationBloc>(context).add(
-              DeleteDeliveryDestinationEvent(
-                deliveryDestinationId: deliveryDestination.id!,
-              ),
-            );
-          },
-        ) : SizedBox(),
+        isSelected && isSelectDestination == false
+            ? IconButton(
+              icon: Icon(CupertinoIcons.delete),
+              color: Theme.of(context).colorScheme.error,
+              onPressed: () {
+                BlocProvider.of<DeliveryDestinationBloc>(context).add(
+                  DeleteDeliveryDestinationEvent(
+                    deliveryDestinationId: deliveryDestination.id!,
+                  ),
+                );
+              },
+            )
+            : SizedBox(),
       ],
     );
   }

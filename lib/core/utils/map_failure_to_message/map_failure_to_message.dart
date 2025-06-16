@@ -17,6 +17,8 @@ String mapFailureToMessage({required Failure failure}) {
     return failure.message;
   }else if (failure is InvalidUpdateFailure) {
     return failure.message;
+  }else if (failure is StripePaymentFailure) {
+    return failure.message;
   } else {
     return 'Unexpected Error';
   }

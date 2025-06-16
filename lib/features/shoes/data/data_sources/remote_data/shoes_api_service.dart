@@ -1,5 +1,3 @@
-
-
 import 'package:dio/dio.dart';
 import 'package:shoes_app/core/core.dart';
 
@@ -39,6 +37,7 @@ class ShoesApiServiceImpl implements ShoesApiService {
 
       final data = response.data as List<dynamic>;
       final shoes = data.map((e) => ShoeModel.fromJson(e)).toList();
+    
       return shoes;
     } on DioException catch (e) {
       throw ServerException(message: e.response?.data['error']);

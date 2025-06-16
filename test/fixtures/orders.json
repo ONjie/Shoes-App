@@ -1,0 +1,40 @@
+[
+    {
+    "id": 1,
+    "order_id": 1234,
+    "estimated_delivery_date": "2025-05-22T00:00:00.000",
+    "order_status": "orderStatus",
+    "payment_method": "paymentMethod",
+    "delivery_destination": "deliveryDestination",
+    "ordered_items":[
+        {
+        "title": "title",
+        "image": "image",
+        "color": "color",
+        "size": 10,
+        "price": 100.00,
+        "quantity": 1
+        }
+    ], 
+    "total_cost": 120.00
+    },
+    {
+    "id": 2,
+    "order_id": 5678,
+    "estimated_delivery_date": "2025-05-22T00:00:00.000",
+    "order_status": "orderStatus",
+    "payment_method": "paymentMethod",
+    "delivery_destination": "deliveryDestination",
+    "ordered_items":[
+        {
+        "title": "title",
+        "image": "image",
+        "color": "color",
+        "size": 12,
+        "price": 100.00,
+        "quantity": 2
+        }
+    ],
+     "total_cost": 120.00
+    }
+]

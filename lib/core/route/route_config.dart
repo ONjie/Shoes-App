@@ -1,4 +1,5 @@
 import 'package:go_router/go_router.dart';
+import 'package:shoes_app/features/cart/domain/entities/cart_item_entity.dart';
 import 'package:shoes_app/features/delivery_destination/domain/entities/delivery_destination_entity.dart';
 import 'package:shoes_app/features/delivery_destination/presentation/screens/add_delivery_destination_screen.dart';
 import 'package:shoes_app/features/delivery_destination/presentation/screens/edit_delivery_destination_screen.dart';
@@ -15,7 +16,9 @@ import 'package:shoes_app/features/user/presentation/screens/edit_profile_screen
 
 import '../../features/authentication/presentation/screens/change_password_screen.dart';
 import '../../features/authentication/presentation/screens/forgot_password_screen.dart';
+import '../../features/checkout/presentation/screens/checkout_screen.dart';
 import '../../features/delivery_destination/presentation/screens/delivery_destinations_screen.dart';
+import '../../features/delivery_destination/presentation/screens/select_delivery_destination_screen.dart';
 
 final router = GoRouter(
   initialLocation: '/',
@@ -107,6 +110,37 @@ final router = GoRouter(
         final deliveryDestination = state.extra as DeliveryDestinationEntity;
         return EditDeliveryDestinationScreen(
           deliveryDestination: deliveryDestination,
+        );
+      },
+    ),
+    GoRoute(
+      name: 'Select Delviery Destination Screen',
+      path: '/select_delivery_destination',
+      builder: (context, state) {
+        final extra = state.extra as Map<String, dynamic>;
+        final cartItems = extra['cartItems']! as List<CartItemEntity>;
+        final totalCost = extra['totalCost']! as double;
+
+        return SelectDeliveryDestinationScreen(
+          cartItems: cartItems,
+          totalCost: totalCost,
+        );
+      },
+    ),
+    GoRoute(
+      name: 'Checkout Screen',
+      path: '/checkout',
+      builder: (context, state) {
+        final extra = state.extra as Map<String, dynamic>;
+        final cartItems = extra['cartItems']! as List<CartItemEntity>;
+        final totalCost = extra['totalCost']! as double;
+        final deliveryDestination =
+            extra['deliveryDestination'] as DeliveryDestinationEntity;
+
+        return CheckoutScreen(
+          cartItems: cartItems,
+          totalCost: totalCost,
+          deliveryDestination: deliveryDestination
         );
       },
     ),

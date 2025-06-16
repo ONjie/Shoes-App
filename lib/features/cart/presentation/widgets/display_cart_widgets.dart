@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../core/core.dart';
 import '../../domain/entities/cart_item_entity.dart';
 import 'cart_item_card_widget.dart';
@@ -11,7 +12,7 @@ class DisplayCartWidgets extends StatefulWidget {
     required this.totalShoesPrice,
     required this.totalCost,
     required this.deliveryCharge,
-    required this.numberOfItems
+    required this.numberOfItems,
   });
 
   final List<CartItemEntity> cartItems;
@@ -105,7 +106,12 @@ class _DisplayCartWidgetsState extends State<DisplayCartWidgets> {
       borderSideColor: Theme.of(context).colorScheme.primary,
       borderSideWidth: 1,
       padding: const EdgeInsets.all(12),
-      onPressed: () {},
+      onPressed: () {
+        context.go('/select_delivery_destination', extra: {
+          "cartItems": widget.cartItems,
+          "totalCost": widget.totalCost,
+        });
+      },
     );
   }
 }
