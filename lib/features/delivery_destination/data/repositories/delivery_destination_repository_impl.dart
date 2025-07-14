@@ -30,13 +30,10 @@ class DeliveryDestinationRepositoryImpl
     }
 
     try {
-      final deliveryDestinationModel = DeliveryDestinationModel(
-        country: deliveryDestination.country,
-        city: deliveryDestination.city,
-        name: deliveryDestination.name,
-        contactNumber: deliveryDestination.contactNumber,
-        googlePlusCode: deliveryDestination.googlePlusCode,
-      );
+      final deliveryDestinationModel =
+          DeliveryDestinationModel.fromDeliveryDestinationEntity(
+            deliveryDestination: deliveryDestination,
+          );
 
       await deliveryDestinationRemoteDatabaseService.addDeliveryDestination(
         deliveryDestination: deliveryDestinationModel,
@@ -62,27 +59,6 @@ class DeliveryDestinationRepositoryImpl
         deliveryDestinationId: deliveryDestinationId,
       );
       return Right(true);
-    } on SupabaseDatabaseException catch (e) {
-      return Left(SupabaseDatabaseFailure(message: e.message));
-    }
-  }
-
-  @override
-  Future<Either<Failure, DeliveryDestinationEntity>> fetchDeliveryDestination({
-    required int deliveryDestinationId,
-  }) async {
-    if (!await networkInfo.isConnected) {
-      return Left(
-        InternetConnectionFailure(message: noInternetConnectionMessage),
-      );
-    }
-
-    try {
-      final result = await deliveryDestinationRemoteDatabaseService
-          .fetchDeliveryDestination(
-            deliveryDestinationId: deliveryDestinationId,
-          );
-      return Right(result.toDeliveryDestinationEntity());
     } on SupabaseDatabaseException catch (e) {
       return Left(SupabaseDatabaseFailure(message: e.message));
     }
@@ -123,14 +99,10 @@ class DeliveryDestinationRepositoryImpl
     }
 
     try {
-      final deliveryDestinationModel = DeliveryDestinationModel(
-        id: deliveryDestination.id,
-        country: deliveryDestination.country,
-        city: deliveryDestination.city,
-        name: deliveryDestination.name,
-        contactNumber: deliveryDestination.contactNumber,
-        googlePlusCode: deliveryDestination.googlePlusCode,
-      );
+      final deliveryDestinationModel =
+          DeliveryDestinationModel.fromDeliveryDestinationEntity(
+            deliveryDestination: deliveryDestination,
+          );
 
       await deliveryDestinationRemoteDatabaseService.updateDeliveryDestination(
         deliveryDestination: deliveryDestinationModel,

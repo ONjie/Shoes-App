@@ -25,6 +25,10 @@ import 'package:shoes_app/features/delivery_destination/data/repositories/delive
 import 'package:shoes_app/features/delivery_destination/domain/repositories/delivery_destination_repository.dart';
 import 'package:shoes_app/features/delivery_destination/domain/use_cases/add_delivery_destination.dart';
 import 'package:shoes_app/features/delivery_destination/presentation/bloc/delivery_destination_bloc.dart';
+import 'package:shoes_app/features/orders/data/data_sources/remote_data/orders_remote_database_service.dart';
+import 'package:shoes_app/features/orders/data/repositories/orders_repository_impl.dart';
+import 'package:shoes_app/features/orders/domain/use_cases/create_order.dart';
+import 'package:shoes_app/features/orders/presentation/bloc/orders_bloc.dart';
 import 'package:shoes_app/features/shoes/data/data_sources/local_data/shoes_local_database_service.dart';
 import 'package:shoes_app/features/shoes/data/data_sources/remote_data/shoes_api_service.dart';
 import 'package:shoes_app/features/shoes/data/repositories/shoes_repository_impl.dart';
@@ -42,9 +46,12 @@ import 'features/authentication/domain/use_cases/reset_password.dart';
 import 'features/cart/presentation/bloc/cart_bloc.dart';
 import 'features/checkout/domain/use_cases/make_payment.dart';
 import 'features/delivery_destination/domain/use_cases/delete_delivery_destination.dart';
-import 'features/delivery_destination/domain/use_cases/fetch_delivery_destination.dart';
 import 'features/delivery_destination/domain/use_cases/fetch_delivery_destinations.dart';
 import 'features/delivery_destination/domain/use_cases/update_delivery_destination.dart';
+import 'features/orders/domain/repositories/orders_repository.dart';
+import 'features/orders/domain/use_cases/delete_order.dart';
+import 'features/orders/domain/use_cases/fetch_order.dart';
+import 'features/orders/domain/use_cases/fetch_orders.dart';
 import 'features/shoes/domain/use_cases/use_cases.dart';
 
 final locator = GetIt.instance;
@@ -104,7 +111,6 @@ Future<void> init() async {
     () => DeliveryDestinationBloc(
       addDeliveryDestination: locator(),
       fetchDeliveryDestinations: locator(),
-      fetchDeliveryDestination: locator(),
       updateDeliveryDestination: locator(),
       deleteDeliveryDestination: locator(),
     ),
@@ -112,6 +118,16 @@ Future<void> init() async {
 
   //checkout bloc
   locator.registerFactory(() => CheckoutBloc(makePayment: locator()));
+
+  // orders bloc
+  locator.registerFactory(
+    () => OrdersBloc(
+      createOrder: locator(),
+      fetchOrders: locator(),
+      fetchOrder: locator(),
+      deleteOrder: locator(),
+    ),
+  );
 
   //registering use_cases
   // authentication use_cases
@@ -202,9 +218,6 @@ Future<void> init() async {
     () => FetchDeliveryDestinations(deliveryDestinationRepository: locator()),
   );
   locator.registerLazySingleton(
-    () => FetchDeliveryDestination(deliveryDestinationRepository: locator()),
-  );
-  locator.registerLazySingleton(
     () => UpdateDeliveryDestination(deliveryDestinationRepository: locator()),
   );
   locator.registerLazySingleton(
@@ -216,6 +229,12 @@ Future<void> init() async {
     () => MakePayment(checkoutRepository: locator()),
   );
 
+  // orders use_cases
+  locator.registerLazySingleton(() => CreateOrder(ordersRepository: locator()));
+  locator.registerLazySingleton(() => FetchOrders(ordersRepository: locator()));
+  locator.registerLazySingleton(() => FetchOrder(ordersRepository: locator()));
+  locator.registerLazySingleton(() => DeleteOrder(ordersRepository: locator()));
+
   //registering repositories
 
   //authentication repository
@@ -223,6 +242,7 @@ Future<void> init() async {
     () => AuthenticationRepositoryImpl(
       supabaseAuthService: locator(),
       networkInfo: locator(),
+      userRemoteDatabaseService: locator(),
     ),
   );
 
@@ -264,6 +284,14 @@ Future<void> init() async {
     ),
   );
 
+  // orders repository
+  locator.registerLazySingleton<OrdersRepository>(
+    () => OrdersRepositoryImpl(
+      networkInfo: locator(),
+      ordersRemoteDatabaseService: locator(),
+    ),
+  );
+
   //registering dataSources
   // authentication datasource
   locator.registerLazySingleton<SupabaseAuthService>(
@@ -301,6 +329,11 @@ Future<void> init() async {
   // checkout datasources
   locator.registerLazySingleton<StripePaymentService>(
     () => StripePaymentServiceImpl(dio: locator(), stripe: locator()),
+  );
+
+  // orders datasources
+  locator.registerLazySingleton<OrdersRemoteDatabaseService>(
+    () => OrdersRemoteDatabaseServiceImpl(supabaseClient: locator()),
   );
 
   //registering SupabaseClient

@@ -1,7 +1,6 @@
-
 import 'package:dart_frog/dart_frog.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:shoes_api/src/shoes/data_sources/remote_data/supabase_database.dart';
+import 'package:shoes_api/src/shoes/data_sources/remote_data/redis_cache_service.dart';
 import 'package:shoes_api/src/shoes/repositories/shoes_repository.dart';
 import 'package:test/test.dart';
 
@@ -9,32 +8,33 @@ import '../../../../../routes/api/v1/shoes/_middleware.dart';
 
 class _MockRequestContext extends Mock implements RequestContext {}
 
-class MockSupabaseDatabase extends Mock implements SupabaseDatabase {}
+class MockRedisCacheService extends Mock implements RedisCacheService {}
 
 void main() {
-  late MockSupabaseDatabase mockSupabaseDatabase;
+  late MockRedisCacheService mockRedisCacheService;
 
   setUp(() {
-    mockSupabaseDatabase = MockSupabaseDatabase();
+    mockRedisCacheService = MockRedisCacheService();
   });
 
-  test('should provide both ShoesRepository and SupabaseDatabase instances', () async {
+  test('should provide ShoesRepository, RedisCacheService and SupabaseDatabaseService instances',
+      () async {
     //arrange
     late ShoesRepository shoesRepository;
-    late SupabaseDatabase supabaseDatabase;
+    late RedisCacheService redisCacheService;
 
     final shoesRepositoryImpl = ShoesRepositoryImpl(
-      supabaseDatabase: mockSupabaseDatabase,
+      redisService: mockRedisCacheService,
     );
 
     final handler = middleware((context) {
       when(() => context.read<ShoesRepository>())
           .thenReturn(shoesRepositoryImpl);
-      when(() => context.read<SupabaseDatabase>())
-          .thenReturn(mockSupabaseDatabase);
+      when(() => context.read<RedisCacheService>())
+          .thenReturn(mockRedisCacheService);
 
       shoesRepository = context.read<ShoesRepository>();
-      supabaseDatabase = context.read<SupabaseDatabase>();
+      redisCacheService = context.read<RedisCacheService>();
 
       return Response.json();
     });
@@ -44,22 +44,25 @@ void main() {
 
     when(() => context.request).thenReturn(request);
     when(() => context.provide<ShoesRepository>(any())).thenReturn(context);
-    when(() => context.provide<SupabaseDatabase>(any())).thenReturn(context);
+    when(() => context.provide<RedisCacheService>(any())).thenReturn(context);
+    
 
     //act
     await handler(context);
 
     //assert
     expect(shoesRepository, isA<ShoesRepository>());
-    expect(supabaseDatabase, isA<SupabaseDatabase>());
+    expect(redisCacheService, isA<RedisCacheService>());
+   
 
     verify(() => context.read<ShoesRepository>()).called(1);
-    verify(() => context.read<SupabaseDatabase>()).called(1);
+    verify(() => context.read<RedisCacheService>()).called(1);
+  
 
     verify(() => context.provide<ShoesRepository>(captureAny())).captured.single
         as ShoesRepository Function();
-    verify(() => context.provide<SupabaseDatabase>(captureAny()))
+    verify(() => context.provide<RedisCacheService>(captureAny()))
         .captured
-        .single as SupabaseDatabase Function();
+        .single as RedisCacheService Function();
   });
 }

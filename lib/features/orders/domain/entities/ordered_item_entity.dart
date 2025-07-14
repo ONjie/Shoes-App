@@ -27,4 +27,7 @@ class OrderedItemEntity extends Equatable{
     size,
     quantity
   ];
+
+
+
 }

@@ -468,7 +468,7 @@ void main() {
       },
       build: () => shoesBloc,
       act: (bloc) => bloc.add(const AddShoeToFavoriteShoesEvent(shoe: tShoe)),
-      expect: () => null,
+      expect: () => [],
     );
 
     blocTest(
@@ -505,7 +505,7 @@ void main() {
       act:
           (bloc) =>
               bloc.add(const DeleteShoeFromFavoriteShoesEvent(shoeId: tShoeId)),
-      expect: () => null,
+      expect: () => [],
     );
 
     blocTest(

@@ -36,6 +36,7 @@ void main() {
     deliveryDestination: 'deliveryDestination',
     totalCost: 120.00,
     orderedItems: [tOrderedItemModel],
+    createdAt: DateTime.parse('2025-05-22T00:00:00.000'),
   );
 
   final tOrderEntity = OrderEntity(
@@ -47,6 +48,7 @@ void main() {
     deliveryDestination: 'deliveryDestination',
     totalCost: 120.00,
     orderedItems: [tOrderedItemEntity],
+    createdAt: DateTime.parse('2025-05-22T00:00:00.000'),
   );
 
   group('OrderModel', () {

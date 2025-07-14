@@ -15,6 +15,7 @@ void main() {
     contactNumber: 'contactNumber',
     googlePlusCode: 'googlePlusCode',
     updatedAt: DateTime.parse('2025-05-22T00:00:00'),
+    createdAt: DateTime.parse('2025-05-22T00:00:00'),
   );
 
   final tDeliveryDestinationEntity = DeliveryDestinationEntity(
@@ -24,6 +25,7 @@ void main() {
     city: 'city',
     contactNumber: 'contactNumber',
     googlePlusCode: 'googlePlusCode',
+    createdAt: DateTime.parse('2025-05-22T00:00:00'),
   );
 
   group('DeliveryDestinationModel', () {

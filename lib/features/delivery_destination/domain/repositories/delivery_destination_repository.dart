@@ -18,8 +18,4 @@ abstract class DeliveryDestinationRepository {
   Future<Either<Failure, bool>> deleteDeliveryDestination({
     required int deliveryDestinationId,
   });
-
-  Future<Either<Failure, DeliveryDestinationEntity>> fetchDeliveryDestination({
-    required int deliveryDestinationId,
-  });
 }

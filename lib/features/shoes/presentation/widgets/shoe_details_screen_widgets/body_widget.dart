@@ -9,7 +9,6 @@ class BodyWidget extends StatelessWidget {
   const BodyWidget({super.key, required this.shoe,});
 
   final ShoeEntity shoe;
- // final BuildContext context;
 
   @override
   Widget build(BuildContext context) {

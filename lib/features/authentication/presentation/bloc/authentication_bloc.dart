@@ -85,11 +85,20 @@ class AuthenticationBloc
 
     isRightOrFailure.fold(
       (failure) {
-        emit(
-          AuthenticationState(
-            authenticationStatus: AuthenticationStatus.unauthenticated,
-          ),
-        );
+        if(failure is InternetConnectionFailure) {
+          emit(
+            AuthenticationState(
+              authenticationStatus: AuthenticationStatus.noInternetConnection,
+              message: noInternetConnectionMessage
+            ),
+          );
+        } else {
+          emit(
+            AuthenticationState(
+              authenticationStatus: AuthenticationStatus.unauthenticated,
+            ),
+          );
+        }
       },
       (isRight) {
         emit(

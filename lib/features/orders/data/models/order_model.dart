@@ -15,6 +15,7 @@ class OrderModel extends Equatable {
     required this.deliveryDestination,
     required this.totalCost,
     required this.orderedItems,
+    this.createdAt,
   });
 
   final int? id;
@@ -25,6 +26,7 @@ class OrderModel extends Equatable {
   final String deliveryDestination;
   final double totalCost;
   final List<OrderedItemModel> orderedItems;
+  final DateTime? createdAt;
 
   static OrderModel fromJson(MapJson json) => OrderModel(
     id: json['id'] as int,
@@ -33,11 +35,13 @@ class OrderModel extends Equatable {
     orderStatus: json['order_status'] as String,
     paymentMethod: json['payment_method'] as String,
     deliveryDestination: json['delivery_destination'] as String,
-    totalCost: json['total_cost'] as double,
+    totalCost: (json['total_cost'] as num).toDouble(),
     orderedItems:
         (json['ordered_items'] as List<dynamic>)
             .map((orderedItem) => OrderedItemModel.fromJson(orderedItem))
             .toList(),
+
+    createdAt: DateTime.parse(json['created_at']),
   );
 
   MapJson toJson() => {
@@ -50,6 +54,7 @@ class OrderModel extends Equatable {
     "ordered_items":
         orderedItems.map((orderedItem) => orderedItem.toJson()).toList(),
     "total_cost": totalCost,
+    "created_at": createdAt?.toIso8601String(),
   };
 
   static OrderModel fromOrderEntity(OrderEntity orderEntity) => OrderModel(
@@ -67,6 +72,7 @@ class OrderModel extends Equatable {
                   OrderedItemModel.fromOrderedItemEntity(orderedItem),
             )
             .toList(),
+    createdAt: orderEntity.createdAt,
   );
 
   OrderEntity toOrderEntity() => OrderEntity(
@@ -81,6 +87,7 @@ class OrderModel extends Equatable {
         orderedItems
             .map((orderedItem) => orderedItem.toOrderedItemEntity())
             .toList(),
+    createdAt: createdAt,
   );
 
   @override
@@ -93,5 +100,6 @@ class OrderModel extends Equatable {
     deliveryDestination,
     totalCost,
     orderedItems,
+    createdAt,
   ];
 }

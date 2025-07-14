@@ -1,50 +1,68 @@
+import 'dart:convert';
+import 'package:redis/redis.dart';
 import 'package:shoes_api/core/exceptions/exceptions.dart';
 import 'package:shoes_api/core/utils/error/error_message.dart';
+import 'package:shoes_api/env/env.dart';
 import 'package:shoes_api/src/shoes/models/shoe.dart';
-import 'package:shoes_api/src/shoes/models/shoe_data.dart';
-import 'package:supabase/supabase.dart';
 
 typedef ShoeList = List<Shoe>;
 
-abstract class SupabaseDatabase {
-  Future<ShoeList> fetchShoes();
-
-  Future<ShoeList> fetchShoesSuggestions({required String title});
-
-  Future<Shoe> fetchShoeById({required int id});
-
-  Future<ShoeList> fetchShoesByBrand({required String brand});
-
-  Future<ShoeList> fetchShoesByCategoryAndBrand(
-      {required String category, required String brand,});
-
+abstract class RedisCacheService {
   Future<ShoeList> fetchLatestShoes();
-
-  Future<ShoeList> fetchPopularShoes();
-
-  Future<ShoeList> fetchOtherShoes();
 
   Future<ShoeList> fetchLatestShoesByBrand({required String brand});
 
-  Future<ShoeList> fetchPopularShoesByBrand({required String brand});
+  Future<ShoeList> fetchOtherShoes();
 
   Future<ShoeList> fetchOtherShoesByBrand({required String brand});
+
+  Future<ShoeList> fetchPopularShoes();
+
+  Future<ShoeList> fetchPopularShoesByBrand({required String brand});
+
+  Future<Shoe> fetchShoeById({required int id});
+
+  Future<ShoeList> fetchShoes();
+
+  Future<ShoeList> fetchShoesByBrand({required String brand});
+
+  Future<ShoeList> fetchShoesByCategoryAndBrand({
+    required String category,
+    required String brand,
+  });
+
+  Future<ShoeList> fetchShoesSuggestions({required String title});
 }
 
-class SupabaseDatabaseImpl implements SupabaseDatabase {
-  SupabaseDatabaseImpl({required this.supabaseClient});
-  final SupabaseClient supabaseClient;
+class RedisCacheServiceImpl implements RedisCacheService {
+  RedisCacheServiceImpl({required this.connection});
+  final RedisConnection connection;
+  late Command command;
 
-  Future<ShoeList> _fetchShoesData() async {
+  Future<void> init() async {
     try {
-      final results =
-          await supabaseClient.from('shoes').select('shoes_data').single();
+      command = await connection.connect(
+        Env.redisHost,
+        int.parse(Env.redisPort),
+      );
 
-      final data = ShoesData.fromJson(results);
-
-      return data.shoesData;
+      await command.send_object(['AUTH', Env.redisPassword]);
     } catch (e) {
-      throw SupabaseException(message: e.toString());
+      throw RedisCacheException(message: e.toString());
+    }
+  }
+
+  Future<ShoeList> _fetchShoes() async {
+    try {
+      final result = await command.send_object(['JSON.GET', Env.cacheKey]);
+      final jsonList = jsonDecode(result as String) as List<dynamic>;
+      final shoes = jsonList
+          .map((json) => Shoe.fromJson(json as Map<String, dynamic>))
+          .toList();
+
+      return shoes;
+    } catch (e) {
+      throw RedisCacheException(message: e.toString());
     }
   }
 
@@ -52,7 +70,7 @@ class SupabaseDatabaseImpl implements SupabaseDatabase {
     required bool Function(Shoe) filter,
     required String errorMessage,
   }) async {
-    final shoes = await _fetchShoesData();
+    final shoes = await _fetchShoes();
 
     final filteredShoes = shoes.where(filter).toList();
 
@@ -73,7 +91,7 @@ class SupabaseDatabaseImpl implements SupabaseDatabase {
   @override
   Future<ShoeList> fetchLatestShoesByBrand({required String brand}) async {
     return _filterShoes(
-      filter: (shoe) => shoe.brand == brand && shoe.isNew,
+      filter: (shoe) => shoe.isNew && shoe.brand == brand,
       errorMessage: fetchLatestShoesByBrandErrorMessage,
     );
   }
@@ -81,7 +99,7 @@ class SupabaseDatabaseImpl implements SupabaseDatabase {
   @override
   Future<ShoeList> fetchOtherShoes() async {
     return _filterShoes(
-      filter: (shoe) => !shoe.isPopular && !shoe.isNew,
+      filter: (shoe) => !shoe.isNew && !shoe.isPopular,
       errorMessage: fetchOtherShoesErrorMessage,
     );
   }
@@ -89,7 +107,7 @@ class SupabaseDatabaseImpl implements SupabaseDatabase {
   @override
   Future<ShoeList> fetchOtherShoesByBrand({required String brand}) async {
     return _filterShoes(
-      filter: (shoe) => shoe.brand == brand && !shoe.isPopular && !shoe.isNew,
+      filter: (shoe) => !shoe.isNew && !shoe.isPopular && shoe.brand == brand,
       errorMessage: fetchOtherShoesByBrandErrorMessage,
     );
   }
@@ -105,7 +123,7 @@ class SupabaseDatabaseImpl implements SupabaseDatabase {
   @override
   Future<ShoeList> fetchPopularShoesByBrand({required String brand}) async {
     return _filterShoes(
-      filter: (shoe) => shoe.brand == brand && shoe.isPopular,
+      filter: (shoe) => shoe.isPopular && shoe.brand == brand,
       errorMessage: fetchPopularShoesByBrandErrorMessage,
     );
   }
@@ -113,17 +131,19 @@ class SupabaseDatabaseImpl implements SupabaseDatabase {
   @override
   Future<Shoe> fetchShoeById({required int id}) async {
     try {
-      final shoes = await _fetchShoesData();
+      final shoes = await _fetchShoes();
 
-      return shoes.firstWhere((shoe) => shoe.id == id);
+      final shoe = shoes.firstWhere((shoe) => shoe.id == id);
+
+      return shoe;
     } catch (e) {
-      throw SupabaseException(message: e.toString());
+      throw RedisCacheException(message: e.toString());
     }
   }
 
   @override
-  Future<List<Shoe>> fetchShoes() async {
-    return _fetchShoesData();
+  Future<ShoeList> fetchShoes() async {
+    return _fetchShoes();
   }
 
   @override

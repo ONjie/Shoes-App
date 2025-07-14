@@ -16,15 +16,6 @@ class FetchDeliveryDestinationsEvent extends DeliveryDestinationEvent {
   List<Object?> get props => [];
 }
 
-class FetchDeliveryDestinationEvent extends DeliveryDestinationEvent {
-  final int deliveryDestinationId;
-
-  FetchDeliveryDestinationEvent({required this.deliveryDestinationId});
-
-  @override
-  List<Object?> get props => [deliveryDestinationId];
-}
-
 class DeleteDeliveryDestinationEvent extends DeliveryDestinationEvent {
   final int deliveryDestinationId;
 

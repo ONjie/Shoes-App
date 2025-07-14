@@ -3,7 +3,7 @@ part of 'cart_bloc.dart';
 enum CartItemsStatus {
   initial,
   loading,
-  cartItemsLoaded,
+  cartItemsFetched,
   cartItemAdded,
   cartItemDeleted,
   cartItemQuantityUpdated,
@@ -21,19 +21,15 @@ class CartState extends Equatable {
     this.cartItems,
     this.totalShoesPrice,
     this.totalCost,
-    this.deliveryCharge,
-    this.successMessage,
-    this.errorMessage,
-    this.numberOfItems
+    this.message,
+    this.numberOfItems,
   });
 
   final CartItemsStatus cartItemsStatus;
   final List<CartItemEntity>? cartItems;
   final double? totalShoesPrice;
   final double? totalCost;
-  final double? deliveryCharge;
-  final String? successMessage;
-  final String? errorMessage;
+  final String? message;
   final int? numberOfItems;
 
   @override
@@ -42,9 +38,7 @@ class CartState extends Equatable {
     cartItems,
     totalShoesPrice,
     totalCost,
-    deliveryCharge,
-    successMessage,
-    errorMessage,
-    numberOfItems
+    message,
+    numberOfItems,
   ];
 }

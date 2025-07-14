@@ -3,46 +3,50 @@ import 'package:mocktail/mocktail.dart';
 import 'package:shoes_api/core/exceptions/exceptions.dart';
 import 'package:shoes_api/core/failures/failures.dart';
 import 'package:shoes_api/core/utils/error/error_message.dart';
-import 'package:shoes_api/src/shoes/data_sources/remote_data/supabase_database.dart';
+import 'package:shoes_api/src/shoes/data_sources/remote_data/redis_cache_service.dart';
 import 'package:shoes_api/src/shoes/models/shoe.dart';
 import 'package:shoes_api/src/shoes/repositories/shoes_repository.dart';
 import 'package:test/test.dart';
 
-class MockSupabaseDatabase extends Mock implements SupabaseDatabase {}
+const redisCacheError = 'such key does not exist';
+
+
+class MockRedisCacheService extends Mock implements RedisCacheService {}
 
 void main() {
-  late MockSupabaseDatabase supabaseDatabase;
+  late MockRedisCacheService mockRedisCacheService;
   late ShoesRepositoryImpl shoesRepositoryImpl;
 
   setUp(() {
-    supabaseDatabase = MockSupabaseDatabase();
-    shoesRepositoryImpl =
-        ShoesRepositoryImpl(supabaseDatabase: supabaseDatabase);
+    mockRedisCacheService = MockRedisCacheService();
+    shoesRepositoryImpl = ShoesRepositoryImpl(
+      redisService: mockRedisCacheService,
+    );
   });
 
   const tShoe = Shoe(
     id: 1,
-    title: 'Title',
-    description: 'Description',
-    images: ['image1', 'image2', 'image3'],
+    title: 'title',
+    description: 'description',
+    images: ['image'],
     price: 100,
     brand: 'brand',
-    colors: ['color1', 'color2', 'color3'],
+    colors: ['color'],
     sizes: [1, 2, 3, 4, 5],
     isPopular: true,
     isNew: true,
-    category: 'Men',
+    category: 'category',
     ratings: 1.5,
   );
 
   const tLatestShoe = Shoe(
     id: 1,
-    title: 'Title',
-    description: 'Description',
-    images: ['image1', 'image2', 'image3'],
+    title: 'title',
+    description: 'description',
+    images: ['image'],
     price: 100,
     brand: 'brand',
-    colors: ['color1', 'color2', 'color3'],
+    colors: ['color'],
     sizes: [1, 2, 3, 4, 5],
     isPopular: false,
     isNew: true,
@@ -52,12 +56,12 @@ void main() {
 
   const tPopular = Shoe(
     id: 1,
-    title: 'Title',
-    description: 'Description',
-    images: ['image1', 'image2', 'image3'],
+    title: 'title',
+    description: 'description',
+    images: ['image'],
     price: 100,
     brand: 'brand',
-    colors: ['color1', 'color2', 'color3'],
+    colors: ['color'],
     sizes: [1, 2, 3, 4, 5],
     isPopular: true,
     isNew: false,
@@ -67,12 +71,12 @@ void main() {
 
   const tOtherShoe = Shoe(
     id: 1,
-    title: 'Title',
-    description: 'Description',
-    images: ['image1', 'image2', 'image3'],
+    title: 'title',
+    description: 'description',
+    images: ['image'],
     price: 100,
     brand: 'brand',
-    colors: ['color1', 'color2', 'color3'],
+    colors: ['color'],
     sizes: [1, 2, 3, 4, 5],
     isPopular: false,
     isNew: false,
@@ -83,11 +87,10 @@ void main() {
   const tBrand = 'brand';
 
   group('fetchLatestShoes', () {
-    test(
-        'should return a list of latest shoes when the call to SupabaseDatabase is successful',
+    test('should return a list of latest shoes when call is successful',
         () async {
       // arrange
-      when(() => supabaseDatabase.fetchLatestShoes())
+      when(() => mockRedisCacheService.fetchLatestShoes())
           .thenAnswer((_) async => [tLatestShoe]);
 
       // act
@@ -96,16 +99,15 @@ void main() {
       // assert
       expect(result, isA<Right<Failure, List<Shoe>>>());
       expect(result.right, equals([tLatestShoe]));
-      verify(() => supabaseDatabase.fetchLatestShoes()).called(1);
-      verifyNoMoreInteractions(supabaseDatabase);
+      verify(() => mockRedisCacheService.fetchLatestShoes()).called(1);
+      verifyNoMoreInteractions(mockRedisCacheService);
     });
 
-    test(
-        'should return a SupabaseFailure when SupabaseException is thrown by SupabaseDatabase',
+    test('should return a RedisCacheFailure when RedisCacheException is thrown',
         () async {
       // arrange
-      when(() => supabaseDatabase.fetchLatestShoes())
-          .thenThrow(SupabaseException(message: supabaseDatabaseError));
+      when(() => mockRedisCacheService.fetchLatestShoes())
+          .thenThrow(RedisCacheException(message: redisCacheError));
       // act
       final result = await shoesRepositoryImpl.fetchLatestShoes();
 
@@ -113,17 +115,17 @@ void main() {
       expect(result, isA<Left<Failure, List<Shoe>>>());
       expect(
         result.left,
-        equals(const SupabaseFailure(message: supabaseDatabaseError)),
+        equals(const RedisCacheFailure(message: redisCacheError)),
       );
-      verify(() => supabaseDatabase.fetchLatestShoes()).called(1);
-      verifyNoMoreInteractions(supabaseDatabase);
+      verify(() => mockRedisCacheService.fetchLatestShoes()).called(1);
+      verifyNoMoreInteractions(mockRedisCacheService);
     });
 
     test(
-        'should return a OtherFailure when OtherException is thrown by SupabaseDatabase',
+        'should return a OtherFailure when OtherException is thrown',
         () async {
       // arrange
-      when(() => supabaseDatabase.fetchLatestShoes())
+      when(() => mockRedisCacheService.fetchLatestShoes())
           .thenThrow(OtherException(message: fetchLatestShoesErrorMessage));
       // act
       final result = await shoesRepositoryImpl.fetchLatestShoes();
@@ -134,18 +136,18 @@ void main() {
         result.left,
         equals(const OtherFailure(message: fetchLatestShoesErrorMessage)),
       );
-      verify(() => supabaseDatabase.fetchLatestShoes()).called(1);
-      verifyNoMoreInteractions(supabaseDatabase);
+      verify(() => mockRedisCacheService.fetchLatestShoes()).called(1);
+      verifyNoMoreInteractions(mockRedisCacheService);
     });
   });
 
   group('fetchLatestShoesbyBrand', () {
     test(
-        'should return a list of latest shoes by brand when the call to SupabaseDatabase is successful',
+        'should return a list of latest shoes by brand when call is successful',
         () async {
       // arrange
       when(
-        () => supabaseDatabase.fetchLatestShoesByBrand(
+        () => mockRedisCacheService.fetchLatestShoesByBrand(
           brand: any(named: 'brand'),
         ),
       ).thenAnswer((_) async => [tLatestShoe]);
@@ -158,22 +160,22 @@ void main() {
       expect(result, isA<Right<Failure, List<Shoe>>>());
       expect(result.right, equals([tLatestShoe]));
       verify(
-        () => supabaseDatabase.fetchLatestShoesByBrand(
+        () => mockRedisCacheService.fetchLatestShoesByBrand(
           brand: any(named: 'brand'),
         ),
       ).called(1);
-      verifyNoMoreInteractions(supabaseDatabase);
+      verifyNoMoreInteractions(mockRedisCacheService);
     });
 
     test(
-        'should return a SupabaseFailure when SupabaseException is thrown by SupabaseDatabase',
+        'should return a RedisCacheFailure when RedisCacheException is thrown',
         () async {
       // arrange
       when(
-        () => supabaseDatabase.fetchLatestShoesByBrand(
+        () => mockRedisCacheService.fetchLatestShoesByBrand(
           brand: any(named: 'brand'),
         ),
-      ).thenThrow(SupabaseException(message: supabaseDatabaseError));
+      ).thenThrow(RedisCacheException(message: redisCacheError));
       // act
       final result =
           await shoesRepositoryImpl.fetchLatestShoesByBrand(brand: tBrand);
@@ -182,22 +184,22 @@ void main() {
       expect(result, isA<Left<Failure, List<Shoe>>>());
       expect(
         result.left,
-        equals(const SupabaseFailure(message: supabaseDatabaseError)),
+        equals(const RedisCacheFailure(message: redisCacheError)),
       );
       verify(
-        () => supabaseDatabase.fetchLatestShoesByBrand(
+        () => mockRedisCacheService.fetchLatestShoesByBrand(
           brand: any(named: 'brand'),
         ),
       ).called(1);
-      verifyNoMoreInteractions(supabaseDatabase);
+      verifyNoMoreInteractions(mockRedisCacheService);
     });
 
     test(
-        'should return a OtherFailure when OtherException is thrown by SupabaseDatabase',
+        'should return a OtherFailure when OtherException is thrown',
         () async {
       // arrange
       when(
-        () => supabaseDatabase.fetchLatestShoesByBrand(
+        () => mockRedisCacheService.fetchLatestShoesByBrand(
           brand: any(named: 'brand'),
         ),
       ).thenThrow(OtherException(message: fetchLatestShoesByBrandErrorMessage));
@@ -214,20 +216,20 @@ void main() {
         ),
       );
       verify(
-        () => supabaseDatabase.fetchLatestShoesByBrand(
+        () => mockRedisCacheService.fetchLatestShoesByBrand(
           brand: any(named: 'brand'),
         ),
       ).called(1);
-      verifyNoMoreInteractions(supabaseDatabase);
+      verifyNoMoreInteractions(mockRedisCacheService);
     });
   });
 
-  group('fetchOtherShoes', () {
+ group('fetchOtherShoes', () {
     test(
-        'should return a list of other shoes when the call to SupabaseDatabase is successful',
+        'should return a list of other shoes when call is successful',
         () async {
       // arrange
-      when(() => supabaseDatabase.fetchOtherShoes())
+      when(() => mockRedisCacheService.fetchOtherShoes())
           .thenAnswer((_) async => [tOtherShoe]);
 
       // act
@@ -236,16 +238,16 @@ void main() {
       // assert
       expect(result, isA<Right<Failure, List<Shoe>>>());
       expect(result.right, equals([tOtherShoe]));
-      verify(() => supabaseDatabase.fetchOtherShoes()).called(1);
-      verifyNoMoreInteractions(supabaseDatabase);
+      verify(() => mockRedisCacheService.fetchOtherShoes()).called(1);
+      verifyNoMoreInteractions(mockRedisCacheService);
     });
 
     test(
-        'should return a SupabaseFailure when SupabaseException is thrown by SupabaseDatabase',
+        'should return a RedisCacheFailure when RedisCacheException is thrown',
         () async {
       // arrange
-      when(() => supabaseDatabase.fetchOtherShoes())
-          .thenThrow(SupabaseException(message: supabaseDatabaseError));
+      when(() => mockRedisCacheService.fetchOtherShoes())
+          .thenThrow(RedisCacheException(message: redisCacheError));
       // act
       final result = await shoesRepositoryImpl.fetchOtherShoes();
 
@@ -253,17 +255,17 @@ void main() {
       expect(result, isA<Left<Failure, List<Shoe>>>());
       expect(
         result.left,
-        equals(const SupabaseFailure(message: supabaseDatabaseError)),
+        equals(const RedisCacheFailure(message: redisCacheError)),
       );
-      verify(() => supabaseDatabase.fetchOtherShoes()).called(1);
-      verifyNoMoreInteractions(supabaseDatabase);
+      verify(() => mockRedisCacheService.fetchOtherShoes()).called(1);
+      verifyNoMoreInteractions(mockRedisCacheService);
     });
 
     test(
-        'should return a OtherFailure when OtherException is thrown by SupabaseDatabase',
+        'should return a OtherFailure when OtherException is thrown',
         () async {
       // arrange
-      when(() => supabaseDatabase.fetchOtherShoes())
+      when(() => mockRedisCacheService.fetchOtherShoes())
           .thenThrow(OtherException(message: fetchOtherShoesErrorMessage));
       // act
       final result = await shoesRepositoryImpl.fetchOtherShoes();
@@ -274,18 +276,18 @@ void main() {
         result.left,
         equals(const OtherFailure(message: fetchOtherShoesErrorMessage)),
       );
-      verify(() => supabaseDatabase.fetchOtherShoes()).called(1);
-      verifyNoMoreInteractions(supabaseDatabase);
+      verify(() => mockRedisCacheService.fetchOtherShoes()).called(1);
+      verifyNoMoreInteractions(mockRedisCacheService);
     });
   });
 
   group('fetchOtherShoesbyBrand', () {
     test(
-        'should return a list of other shoes by brand when the call to SupabaseDatabase is successful',
+        'should return a list of other shoes by brand when call is successful',
         () async {
       // arrange
       when(
-        () => supabaseDatabase.fetchOtherShoesByBrand(
+        () => mockRedisCacheService.fetchOtherShoesByBrand(
           brand: any(named: 'brand'),
         ),
       ).thenAnswer((_) async => [tOtherShoe]);
@@ -298,22 +300,22 @@ void main() {
       expect(result, isA<Right<Failure, List<Shoe>>>());
       expect(result.right, equals([tOtherShoe]));
       verify(
-        () => supabaseDatabase.fetchOtherShoesByBrand(
+        () => mockRedisCacheService.fetchOtherShoesByBrand(
           brand: any(named: 'brand'),
         ),
       ).called(1);
-      verifyNoMoreInteractions(supabaseDatabase);
+      verifyNoMoreInteractions(mockRedisCacheService);
     });
 
     test(
-        'should return a SupabaseFailure when SupabaseException is thrown by SupabaseDatabase',
+        'should return a RedisCacheFailure when RedisCacheException is thrown',
         () async {
       // arrange
       when(
-        () => supabaseDatabase.fetchOtherShoesByBrand(
+        () => mockRedisCacheService.fetchOtherShoesByBrand(
           brand: any(named: 'brand'),
         ),
-      ).thenThrow(SupabaseException(message: supabaseDatabaseError));
+      ).thenThrow(RedisCacheException(message: redisCacheError));
       // act
       final result =
           await shoesRepositoryImpl.fetchOtherShoesByBrand(brand: tBrand);
@@ -322,22 +324,22 @@ void main() {
       expect(result, isA<Left<Failure, List<Shoe>>>());
       expect(
         result.left,
-        equals(const SupabaseFailure(message: supabaseDatabaseError)),
+        equals(const RedisCacheFailure(message: redisCacheError)),
       );
       verify(
-        () => supabaseDatabase.fetchOtherShoesByBrand(
+        () => mockRedisCacheService.fetchOtherShoesByBrand(
           brand: any(named: 'brand'),
         ),
       ).called(1);
-      verifyNoMoreInteractions(supabaseDatabase);
+      verifyNoMoreInteractions(mockRedisCacheService);
     });
 
     test(
-        'should return a OtherFailure when OtherException is thrown by SupabaseDatabase',
+        'should return a OtherFailure when OtherException is thrown',
         () async {
       // arrange
       when(
-        () => supabaseDatabase.fetchOtherShoesByBrand(
+        () => mockRedisCacheService.fetchOtherShoesByBrand(
           brand: any(named: 'brand'),
         ),
       ).thenThrow(OtherException(message: fetchOtherShoesByBrandErrorMessage));
@@ -352,20 +354,20 @@ void main() {
         equals(const OtherFailure(message: fetchOtherShoesByBrandErrorMessage)),
       );
       verify(
-        () => supabaseDatabase.fetchOtherShoesByBrand(
+        () => mockRedisCacheService.fetchOtherShoesByBrand(
           brand: any(named: 'brand'),
         ),
       ).called(1);
-      verifyNoMoreInteractions(supabaseDatabase);
+      verifyNoMoreInteractions(mockRedisCacheService);
     });
   });
 
   group('fetchPopularShoes', () {
     test(
-        'should return a list of popular shoes when the call to SupabaseDatabase is successful',
+        'should return a list of popular shoes when call is successful',
         () async {
       // arrange
-      when(() => supabaseDatabase.fetchPopularShoes())
+      when(() => mockRedisCacheService.fetchPopularShoes())
           .thenAnswer((_) async => [tPopular]);
 
       // act
@@ -374,16 +376,16 @@ void main() {
       // assert
       expect(result, isA<Right<Failure, List<Shoe>>>());
       expect(result.right, equals([tPopular]));
-      verify(() => supabaseDatabase.fetchPopularShoes()).called(1);
-      verifyNoMoreInteractions(supabaseDatabase);
+      verify(() => mockRedisCacheService.fetchPopularShoes()).called(1);
+      verifyNoMoreInteractions(mockRedisCacheService);
     });
 
     test(
-        'should return a SupabaseFailure when SupabaseException is thrown by SupabaseDatabase',
+        'should return a RedisCacheFailure when RedisCacheException is thrown',
         () async {
       // arrange
-      when(() => supabaseDatabase.fetchPopularShoes())
-          .thenThrow(SupabaseException(message: supabaseDatabaseError));
+      when(() => mockRedisCacheService.fetchPopularShoes())
+          .thenThrow(RedisCacheException(message: redisCacheError));
       // act
       final result = await shoesRepositoryImpl.fetchPopularShoes();
 
@@ -391,17 +393,17 @@ void main() {
       expect(result, isA<Left<Failure, List<Shoe>>>());
       expect(
         result.left,
-        equals(const SupabaseFailure(message: supabaseDatabaseError)),
+        equals(const RedisCacheFailure(message: redisCacheError)),
       );
-      verify(() => supabaseDatabase.fetchPopularShoes()).called(1);
-      verifyNoMoreInteractions(supabaseDatabase);
+      verify(() => mockRedisCacheService.fetchPopularShoes()).called(1);
+      verifyNoMoreInteractions(mockRedisCacheService);
     });
 
     test(
-        'should return a OtherFailure when OtherException is thrown by SupabaseDatabase',
+        'should return a OtherFailure when OtherException is thrown',
         () async {
       // arrange
-      when(() => supabaseDatabase.fetchPopularShoes())
+      when(() => mockRedisCacheService.fetchPopularShoes())
           .thenThrow(OtherException(message: fetchPopularShoesErrorMessage));
       // act
       final result = await shoesRepositoryImpl.fetchPopularShoes();
@@ -412,18 +414,18 @@ void main() {
         result.left,
         equals(const OtherFailure(message: fetchPopularShoesErrorMessage)),
       );
-      verify(() => supabaseDatabase.fetchPopularShoes()).called(1);
-      verifyNoMoreInteractions(supabaseDatabase);
+      verify(() => mockRedisCacheService.fetchPopularShoes()).called(1);
+      verifyNoMoreInteractions(mockRedisCacheService);
     });
   });
 
   group('fetchPopularShoesbyBrand', () {
     test(
-        'should return a list of popular shoes by brand when the call to SupabaseDatabase is successful',
+        'should return a list of popular shoes by brand when call is successful',
         () async {
       // arrange
       when(
-        () => supabaseDatabase.fetchPopularShoesByBrand(
+        () => mockRedisCacheService.fetchPopularShoesByBrand(
           brand: any(named: 'brand'),
         ),
       ).thenAnswer((_) async => [tPopular]);
@@ -436,22 +438,22 @@ void main() {
       expect(result, isA<Right<Failure, List<Shoe>>>());
       expect(result.right, equals([tPopular]));
       verify(
-        () => supabaseDatabase.fetchPopularShoesByBrand(
+        () => mockRedisCacheService.fetchPopularShoesByBrand(
           brand: any(named: 'brand'),
         ),
       ).called(1);
-      verifyNoMoreInteractions(supabaseDatabase);
+      verifyNoMoreInteractions(mockRedisCacheService);
     });
 
     test(
-        'should return a SupabaseFailure when SupabaseException is thrown by SupabaseDatabase',
+        'should return a RedisCacheFailure when RedisCacheException is thrown',
         () async {
       // arrange
       when(
-        () => supabaseDatabase.fetchPopularShoesByBrand(
+        () => mockRedisCacheService.fetchPopularShoesByBrand(
           brand: any(named: 'brand'),
         ),
-      ).thenThrow(SupabaseException(message: supabaseDatabaseError));
+      ).thenThrow(RedisCacheException(message: redisCacheError));
       // act
       final result =
           await shoesRepositoryImpl.fetchPopularShoesByBrand(brand: tBrand);
@@ -460,22 +462,22 @@ void main() {
       expect(result, isA<Left<Failure, List<Shoe>>>());
       expect(
         result.left,
-        equals(const SupabaseFailure(message: supabaseDatabaseError)),
+        equals(const RedisCacheFailure(message: redisCacheError)),
       );
       verify(
-        () => supabaseDatabase.fetchPopularShoesByBrand(
+        () => mockRedisCacheService.fetchPopularShoesByBrand(
           brand: any(named: 'brand'),
         ),
       ).called(1);
-      verifyNoMoreInteractions(supabaseDatabase);
+      verifyNoMoreInteractions(mockRedisCacheService);
     });
 
     test(
-        'should return a OtherFailure when OtherException is thrown by SupabaseDatabase',
+        'should return a OtherFailure when OtherException is thrown',
         () async {
       // arrange
       when(
-        () => supabaseDatabase.fetchPopularShoesByBrand(
+        () => mockRedisCacheService.fetchPopularShoesByBrand(
           brand: any(named: 'brand'),
         ),
       ).thenThrow(
@@ -494,19 +496,20 @@ void main() {
         ),
       );
       verify(
-        () => supabaseDatabase.fetchPopularShoesByBrand(
+        () => mockRedisCacheService.fetchPopularShoesByBrand(
           brand: any(named: 'brand'),
         ),
       ).called(1);
-      verifyNoMoreInteractions(supabaseDatabase);
+      verifyNoMoreInteractions(mockRedisCacheService);
     });
   });
 
   group('fetchShoeById', () {
-    test('should return a shoe when the call to SupabaseDatabase is successful',
+    test('should return a shoe when call is successful',
         () async {
       // arrange
-      when(() => supabaseDatabase.fetchShoeById(id: any(named: 'id')))
+      when(() =>
+              mockRedisCacheService.fetchShoeById(id: any(named: 'id')),)
           .thenAnswer((_) async => tShoe);
 
       // act
@@ -515,17 +518,19 @@ void main() {
       // assert
       expect(result, isA<Right<Failure, Shoe>>());
       expect(result.right, equals(tShoe));
-      verify(() => supabaseDatabase.fetchShoeById(id: any(named: 'id')))
+      verify(() =>
+              mockRedisCacheService.fetchShoeById(id: any(named: 'id')),)
           .called(1);
-      verifyNoMoreInteractions(supabaseDatabase);
+      verifyNoMoreInteractions(mockRedisCacheService);
     });
 
     test(
-        'should return a SupabaseFailure when SupabaseException is thrown by SupabaseDatabase',
+        'should return a RedisCacheFailure when RedisCacheException is thrown',
         () async {
       // arrange
-      when(() => supabaseDatabase.fetchShoeById(id: any(named: 'id')))
-          .thenThrow(SupabaseException(message: supabaseDatabaseError));
+      when(() =>
+              mockRedisCacheService.fetchShoeById(id: any(named: 'id')),)
+          .thenThrow(RedisCacheException(message: redisCacheError));
       // act
       final result = await shoesRepositoryImpl.fetchShoeById(id: tShoe.id);
 
@@ -533,20 +538,21 @@ void main() {
       expect(result, isA<Left<Failure, Shoe>>());
       expect(
         result.left,
-        equals(const SupabaseFailure(message: supabaseDatabaseError)),
+        equals(const RedisCacheFailure(message: redisCacheError)),
       );
-      verify(() => supabaseDatabase.fetchShoeById(id: any(named: 'id')))
+      verify(() =>
+              mockRedisCacheService.fetchShoeById(id: any(named: 'id')),)
           .called(1);
-      verifyNoMoreInteractions(supabaseDatabase);
+      verifyNoMoreInteractions(mockRedisCacheService);
     });
   });
 
   group('fetchShoes', () {
     test(
-        'should return a list of shoes when the call to SupabaseDatabase is successful',
+        'should return a list of shoes when call is successful',
         () async {
       // arrange
-      when(() => supabaseDatabase.fetchShoes())
+      when(() => mockRedisCacheService.fetchShoes())
           .thenAnswer((_) async => [tShoe]);
 
       // act
@@ -555,16 +561,16 @@ void main() {
       // assert
       expect(result, isA<Right<Failure, List<Shoe>>>());
       expect(result.right, equals([tShoe]));
-      verify(() => supabaseDatabase.fetchShoes()).called(1);
-      verifyNoMoreInteractions(supabaseDatabase);
+      verify(() => mockRedisCacheService.fetchShoes()).called(1);
+      verifyNoMoreInteractions(mockRedisCacheService);
     });
 
     test(
-        'should return a SupabaseFailure when SupabaseException is thrown by SupabaseDatabase',
+        'should return a RedisCacheFailure when RedisCacheException is thrown',
         () async {
       // arrange
-      when(() => supabaseDatabase.fetchShoes())
-          .thenThrow(SupabaseException(message: supabaseDatabaseError));
+      when(() => mockRedisCacheService.fetchShoes())
+          .thenThrow(RedisCacheException(message: redisCacheError));
       // act
       final result = await shoesRepositoryImpl.fetchShoes();
 
@@ -572,20 +578,20 @@ void main() {
       expect(result, isA<Left<Failure, List<Shoe>>>());
       expect(
         result.left,
-        equals(const SupabaseFailure(message: supabaseDatabaseError)),
+        equals(const RedisCacheFailure(message: redisCacheError)),
       );
-      verify(() => supabaseDatabase.fetchShoes()).called(1);
-      verifyNoMoreInteractions(supabaseDatabase);
+      verify(() => mockRedisCacheService.fetchShoes()).called(1);
+      verifyNoMoreInteractions(mockRedisCacheService);
     });
   });
 
   group('fetchShoesByBrand', () {
     test(
-        'should return a list of shoes by brand when the call to SupabaseDatabase is successful',
+        'should return a list of shoes by brand when call is successful',
         () async {
       // arrange
-      when(() => supabaseDatabase.fetchShoesByBrand(brand: any(named: 'brand')))
-          .thenAnswer((_) async => [tShoe]);
+      when(() => mockRedisCacheService.fetchShoesByBrand(
+          brand: any(named: 'brand'),),).thenAnswer((_) async => [tShoe]);
 
       // act
       final result = await shoesRepositoryImpl.fetchShoesByBrand(brand: tBrand);
@@ -593,18 +599,20 @@ void main() {
       // assert
       expect(result, isA<Right<Failure, List<Shoe>>>());
       expect(result.right, equals([tShoe]));
-      verify(() =>
-              supabaseDatabase.fetchShoesByBrand(brand: any(named: 'brand')),)
-          .called(1);
-      verifyNoMoreInteractions(supabaseDatabase);
+      verify(
+        () => mockRedisCacheService.fetchShoesByBrand(
+            brand: any(named: 'brand'),),
+      ).called(1);
+      verifyNoMoreInteractions(mockRedisCacheService);
     });
 
     test(
-        'should return a SupabaseFailure when SupabaseException is thrown by SupabaseDatabase',
+        'should return a RedisCacheFailure when RedisCacheException is thrown',
         () async {
       // arrange
-      when(() => supabaseDatabase.fetchShoesByBrand(brand: any(named: 'brand')))
-          .thenThrow(SupabaseException(message: supabaseDatabaseError));
+      when(() => mockRedisCacheService.fetchShoesByBrand(
+              brand: any(named: 'brand'),),)
+          .thenThrow(RedisCacheException(message: redisCacheError));
       // act
       final result = await shoesRepositoryImpl.fetchShoesByBrand(brand: tBrand);
 
@@ -612,19 +620,21 @@ void main() {
       expect(result, isA<Left<Failure, List<Shoe>>>());
       expect(
         result.left,
-        equals(const SupabaseFailure(message: supabaseDatabaseError)),
+        equals(const RedisCacheFailure(message: redisCacheError)),
       );
-      verify(() =>
-              supabaseDatabase.fetchShoesByBrand(brand: any(named: 'brand')),)
-          .called(1);
-      verifyNoMoreInteractions(supabaseDatabase);
+      verify(
+        () => mockRedisCacheService.fetchShoesByBrand(
+            brand: any(named: 'brand'),),
+      ).called(1);
+      verifyNoMoreInteractions(mockRedisCacheService);
     });
 
     test(
-        'should return a OtherFailure when OtherException is thrown by SupabaseDatabase',
+        'should return a OtherFailure when OtherException is thrown',
         () async {
       // arrange
-      when(() => supabaseDatabase.fetchShoesByBrand(brand: any(named: 'brand')))
+      when(() => mockRedisCacheService.fetchShoesByBrand(
+              brand: any(named: 'brand'),),)
           .thenThrow(OtherException(message: fetchShoesByBrandErrorMessage));
       // act
       final result = await shoesRepositoryImpl.fetchShoesByBrand(brand: tBrand);
@@ -635,69 +645,91 @@ void main() {
         result.left,
         equals(const OtherFailure(message: fetchShoesByBrandErrorMessage)),
       );
-      verify(() =>
-              supabaseDatabase.fetchShoesByBrand(brand: any(named: 'brand')),)
-          .called(1);
-      verifyNoMoreInteractions(supabaseDatabase);
+      verify(
+        () => mockRedisCacheService.fetchShoesByBrand(
+            brand: any(named: 'brand'),),
+      ).called(1);
+      verifyNoMoreInteractions(mockRedisCacheService);
     });
   });
 
   group('fetchShoesByCategoryAndBrand', () {
     const tCategory = 'category';
     test(
-        'should return a list of shoes by category when the call to SupabaseDatabase is successful',
+        'should return a list of shoes by category when call is successful',
         () async {
       // arrange
-      when(() => supabaseDatabase.fetchShoesByCategoryAndBrand(
+      when(
+        () => mockRedisCacheService.fetchShoesByCategoryAndBrand(
           category: any(named: 'category'),
-          brand: any(named: 'brand'),),).thenAnswer((_) async => [tShoe]);
+          brand: any(named: 'brand'),
+        ),
+      ).thenAnswer((_) async => [tShoe]);
 
       // act
       final result = await shoesRepositoryImpl.fetchShoesByCategoryAndBrand(
-          category: tCategory, brand: tBrand,);
+        category: tCategory,
+        brand: tBrand,
+      );
 
       // assert
       expect(result, isA<Right<Failure, List<Shoe>>>());
       expect(result.right, equals([tShoe]));
-      verify(() => supabaseDatabase.fetchShoesByCategoryAndBrand(
+      verify(
+        () => mockRedisCacheService.fetchShoesByCategoryAndBrand(
           category: any(named: 'category'),
-          brand: any(named: 'brand'),),).called(1);
-      verifyNoMoreInteractions(supabaseDatabase);
+          brand: any(named: 'brand'),
+        ),
+      ).called(1);
+      verifyNoMoreInteractions(mockRedisCacheService);
     });
 
     test(
-        'should return a SupabaseFailure when SupabaseException is thrown by SupabaseDatabase',
+        'should return a RedisCacheFailure when RedisCacheException is thrown',
         () async {
       // arrange
-      when(() => supabaseDatabase.fetchShoesByCategoryAndBrand(
-              category: any(named: 'category'), brand: any(named: 'brand'),),)
-          .thenThrow(SupabaseException(message: supabaseDatabaseError));
+      when(
+        () => mockRedisCacheService.fetchShoesByCategoryAndBrand(
+          category: any(named: 'category'),
+          brand: any(named: 'brand'),
+        ),
+      ).thenThrow(RedisCacheException(message: redisCacheError));
       // act
       final result = await shoesRepositoryImpl.fetchShoesByCategoryAndBrand(
-          category: tCategory, brand: tBrand,);
+        category: tCategory,
+        brand: tBrand,
+      );
 
       // assert
       expect(result, isA<Left<Failure, List<Shoe>>>());
       expect(
         result.left,
-        equals(const SupabaseFailure(message: supabaseDatabaseError)),
+        equals(const RedisCacheFailure(message: redisCacheError)),
       );
-      verify(() => supabaseDatabase.fetchShoesByCategoryAndBrand(
-              category: any(named: 'category'), brand: any(named: 'brand'),),)
-          .called(1);
-      verifyNoMoreInteractions(supabaseDatabase);
+      verify(
+        () => mockRedisCacheService.fetchShoesByCategoryAndBrand(
+          category: any(named: 'category'),
+          brand: any(named: 'brand'),
+        ),
+      ).called(1);
+      verifyNoMoreInteractions(mockRedisCacheService);
     });
 
     test(
-        'should return a OtherFailure when OtherException is thrown by SupabaseDatabase',
+        'should return a OtherFailure when OtherException is thrown',
         () async {
       // arrange
-      when(() => supabaseDatabase.fetchShoesByCategoryAndBrand(
-              category: any(named: 'category'), brand: any(named: 'brand'),),)
-          .thenThrow(OtherException(message: fetchShoesByCategoryErrorMessage));
+      when(
+        () => mockRedisCacheService.fetchShoesByCategoryAndBrand(
+          category: any(named: 'category'),
+          brand: any(named: 'brand'),
+        ),
+      ).thenThrow(OtherException(message: fetchShoesByCategoryErrorMessage));
       // act
       final result = await shoesRepositoryImpl.fetchShoesByCategoryAndBrand(
-          category: tCategory, brand: tBrand,);
+        category: tCategory,
+        brand: tBrand,
+      );
 
       // assert
       expect(result, isA<Left<Failure, List<Shoe>>>());
@@ -705,21 +737,26 @@ void main() {
         result.left,
         equals(const OtherFailure(message: fetchShoesByCategoryErrorMessage)),
       );
-      verify(() => supabaseDatabase.fetchShoesByCategoryAndBrand(
-              category: any(named: 'category'), brand: any(named: 'brand'),),)
-          .called(1);
-      verifyNoMoreInteractions(supabaseDatabase);
+      verify(
+        () => mockRedisCacheService.fetchShoesByCategoryAndBrand(
+          category: any(named: 'category'),
+          brand: any(named: 'brand'),
+        ),
+      ).called(1);
+      verifyNoMoreInteractions(mockRedisCacheService);
     });
   });
 
   group('fetchShoesSuggestions', () {
-
     test(
-        'should return a list of shoes by suggestion when the call to SupabaseDatabase is successful',
+        'should return a list of shoes by suggestion when call is successful',
         () async {
       // arrange
-      when(() => supabaseDatabase.fetchShoesSuggestions(title: any(named: 'title')))
-          .thenAnswer((_) async => [tShoe]);
+      when(
+        () => mockRedisCacheService.fetchShoesSuggestions(
+          title: any(named: 'title'),
+        ),
+      ).thenAnswer((_) async => [tShoe]);
 
       // act
       final result =
@@ -728,17 +765,23 @@ void main() {
       // assert
       expect(result, isA<Right<Failure, List<Shoe>>>());
       expect(result.right, equals([tShoe]));
-      verify(() => supabaseDatabase.fetchShoesSuggestions(title: any(named: 'title')))
-          .called(1);
-      verifyNoMoreInteractions(supabaseDatabase);
+      verify(
+        () => mockRedisCacheService.fetchShoesSuggestions(
+          title: any(named: 'title'),
+        ),
+      ).called(1);
+      verifyNoMoreInteractions(mockRedisCacheService);
     });
 
     test(
-        'should return a SupabaseFailure when SupabaseException is thrown by SupabaseDatabase',
+        'should return a RedisCacheFailure when RedisCacheException is thrown',
         () async {
       // arrange
-      when(() => supabaseDatabase.fetchShoesSuggestions(title: any(named: 'title')))
-          .thenThrow(SupabaseException(message: supabaseDatabaseError));
+      when(
+        () => mockRedisCacheService.fetchShoesSuggestions(
+          title: any(named: 'title'),
+        ),
+      ).thenThrow(RedisCacheException(message: redisCacheError));
       // act
       final result =
           await shoesRepositoryImpl.fetchShoesSuggestions(title: tShoe.title);
@@ -747,20 +790,27 @@ void main() {
       expect(result, isA<Left<Failure, List<Shoe>>>());
       expect(
         result.left,
-        equals(const SupabaseFailure(message: supabaseDatabaseError)),
+        equals(const RedisCacheFailure(message: redisCacheError)),
       );
-      verify(() => supabaseDatabase.fetchShoesSuggestions(title: any(named: 'title')))
-          .called(1);
-      verifyNoMoreInteractions(supabaseDatabase);
+      verify(
+        () => mockRedisCacheService.fetchShoesSuggestions(
+          title: any(named: 'title'),
+        ),
+      ).called(1);
+      verifyNoMoreInteractions(mockRedisCacheService);
     });
 
     test(
-        'should return a OtherFailure when OtherException is thrown by SupabaseDatabase',
+        'should return a OtherFailure when OtherException is thrown',
         () async {
       // arrange
-      when(() => supabaseDatabase.fetchShoesSuggestions(title: any(named: 'title')))
-          .thenThrow(
-              OtherException(message: fetchShoesSuggestionsErrorMessage),);
+      when(
+        () => mockRedisCacheService.fetchShoesSuggestions(
+          title: any(named: 'title'),
+        ),
+      ).thenThrow(
+        OtherException(message: fetchShoesSuggestionsErrorMessage),
+      );
       // act
       final result =
           await shoesRepositoryImpl.fetchShoesSuggestions(title: tShoe.title);
@@ -771,9 +821,13 @@ void main() {
         result.left,
         equals(const OtherFailure(message: fetchShoesSuggestionsErrorMessage)),
       );
-      verify(() => supabaseDatabase.fetchShoesSuggestions(title: any(named: 'title')))
-          .called(1);
-      verifyNoMoreInteractions(supabaseDatabase);
+      verify(
+        () => mockRedisCacheService.fetchShoesSuggestions(
+          title: any(named: 'title'),
+        ),
+      ).called(1);
+      verifyNoMoreInteractions(mockRedisCacheService);
     });
   });
+
 }

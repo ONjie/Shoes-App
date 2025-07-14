@@ -1,7 +1,7 @@
 import 'package:either_dart/either.dart';
 import 'package:shoes_api/core/exceptions/exceptions.dart';
 import 'package:shoes_api/core/failures/failures.dart';
-import 'package:shoes_api/src/shoes/data_sources/remote_data/supabase_database.dart';
+import 'package:shoes_api/src/shoes/data_sources/remote_data/redis_cache_service.dart';
 import 'package:shoes_api/src/shoes/models/shoe.dart';
 
 typedef EitherShoeListOrFailure = Either<Failure, List<Shoe>>;
@@ -43,8 +43,10 @@ abstract class ShoesRepository {
 }
 
 class ShoesRepositoryImpl implements ShoesRepository {
-  ShoesRepositoryImpl({required this.supabaseDatabase});
-  final SupabaseDatabase supabaseDatabase;
+  ShoesRepositoryImpl({
+    required this.redisService,
+  });
+  final RedisCacheService redisService;
 
   Future<EitherShoeListOrFailure> _fetchShoes({
     required FetchFunction fetchFunction,
@@ -53,8 +55,8 @@ class ShoesRepositoryImpl implements ShoesRepository {
       final shoes = await fetchFunction();
 
       return Right(shoes);
-    } on SupabaseException catch (e) {
-      return Left(SupabaseFailure(message: e.message));
+    } on RedisCacheException catch (e) {
+      return Left(RedisCacheFailure(message: e.message));
     } on OtherException catch (e) {
       return Left(OtherFailure(message: e.message));
     }
@@ -62,7 +64,7 @@ class ShoesRepositoryImpl implements ShoesRepository {
 
   @override
   Future<EitherShoeListOrFailure> fetchLatestShoes() async {
-    return _fetchShoes(fetchFunction: supabaseDatabase.fetchLatestShoes);
+    return _fetchShoes(fetchFunction: redisService.fetchLatestShoes);
   }
 
   @override
@@ -70,14 +72,13 @@ class ShoesRepositoryImpl implements ShoesRepository {
     required String brand,
   }) async {
     return _fetchShoes(
-      fetchFunction: () =>
-          supabaseDatabase.fetchLatestShoesByBrand(brand: brand),
+      fetchFunction: () => redisService.fetchLatestShoesByBrand(brand: brand),
     );
   }
 
   @override
   Future<EitherShoeListOrFailure> fetchOtherShoes() async {
-    return _fetchShoes(fetchFunction: supabaseDatabase.fetchOtherShoes);
+    return _fetchShoes(fetchFunction: redisService.fetchOtherShoes);
   }
 
   @override
@@ -85,14 +86,15 @@ class ShoesRepositoryImpl implements ShoesRepository {
     required String brand,
   }) async {
     return _fetchShoes(
-      fetchFunction: () =>
-          supabaseDatabase.fetchOtherShoesByBrand(brand: brand),
+      fetchFunction: () => redisService.fetchOtherShoesByBrand(brand: brand),
     );
   }
 
   @override
   Future<EitherShoeListOrFailure> fetchPopularShoes() async {
-    return _fetchShoes(fetchFunction: supabaseDatabase.fetchPopularShoes);
+    return _fetchShoes(
+      fetchFunction: redisService.fetchPopularShoes,
+    );
   }
 
   @override
@@ -100,19 +102,18 @@ class ShoesRepositoryImpl implements ShoesRepository {
     required String brand,
   }) async {
     return _fetchShoes(
-      fetchFunction: () =>
-          supabaseDatabase.fetchPopularShoesByBrand(brand: brand),
+      fetchFunction: () => redisService.fetchPopularShoesByBrand(brand: brand),
     );
   }
 
   @override
   Future<Either<Failure, Shoe>> fetchShoeById({required int id}) async {
     try {
-      final shoe = await supabaseDatabase.fetchShoeById(id: id);
+      final shoe = await redisService.fetchShoeById(id: id);
 
       return Right(shoe);
-    } on SupabaseException catch (e) {
-      return Left(SupabaseFailure(message: e.message));
+    } on RedisCacheException catch (e) {
+      return Left(RedisCacheFailure(message: e.message));
     } on OtherException catch (e) {
       return Left(OtherFailure(message: e.message));
     }
@@ -120,23 +121,28 @@ class ShoesRepositoryImpl implements ShoesRepository {
 
   @override
   Future<EitherShoeListOrFailure> fetchShoes() async {
-    return _fetchShoes(fetchFunction: supabaseDatabase.fetchShoes);
+    return _fetchShoes(fetchFunction: redisService.fetchShoes);
   }
 
   @override
-  Future<EitherShoeListOrFailure> fetchShoesByBrand(
-      {required String brand,}) async {
+  Future<EitherShoeListOrFailure> fetchShoesByBrand({
+    required String brand,
+  }) async {
     return _fetchShoes(
-      fetchFunction: () => supabaseDatabase.fetchShoesByBrand(brand: brand),
+      fetchFunction: () => redisService.fetchShoesByBrand(brand: brand),
     );
   }
 
   @override
-  Future<EitherShoeListOrFailure> fetchShoesByCategoryAndBrand(
-      {required String category, required String brand,}) async {
+  Future<EitherShoeListOrFailure> fetchShoesByCategoryAndBrand({
+    required String category,
+    required String brand,
+  }) async {
     return _fetchShoes(
-      fetchFunction: () =>
-          supabaseDatabase.fetchShoesByCategoryAndBrand(category: category, brand: brand),
+      fetchFunction: () => redisService.fetchShoesByCategoryAndBrand(
+        category: category,
+        brand: brand,
+      ),
     );
   }
 
@@ -145,7 +151,7 @@ class ShoesRepositoryImpl implements ShoesRepository {
     required String title,
   }) async {
     return _fetchShoes(
-      fetchFunction: () => supabaseDatabase.fetchShoesSuggestions(title: title),
+      fetchFunction: () => redisService.fetchShoesSuggestions(title: title),
     );
   }
 }

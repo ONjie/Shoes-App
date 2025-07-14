@@ -6,7 +6,6 @@ import 'package:shoes_app/core/failures/failures.dart';
 import 'package:shoes_app/features/delivery_destination/domain/entities/delivery_destination_entity.dart';
 import 'package:shoes_app/features/delivery_destination/domain/use_cases/add_delivery_destination.dart';
 import 'package:shoes_app/features/delivery_destination/domain/use_cases/delete_delivery_destination.dart';
-import 'package:shoes_app/features/delivery_destination/domain/use_cases/fetch_delivery_destination.dart';
 import 'package:shoes_app/features/delivery_destination/domain/use_cases/fetch_delivery_destinations.dart';
 import 'package:shoes_app/features/delivery_destination/domain/use_cases/update_delivery_destination.dart';
 import 'package:shoes_app/features/delivery_destination/presentation/bloc/delivery_destination_bloc.dart';
@@ -16,9 +15,6 @@ class MockAddDeliveryDestination extends Mock
 
 class MockFetchDeliveryDestinations extends Mock
     implements FetchDeliveryDestinations {}
-
-class MockFetchDeliveryDestination extends Mock
-    implements FetchDeliveryDestination {}
 
 class MockUpdateDeliveryDestination extends Mock
     implements UpdateDeliveryDestination {}
@@ -30,21 +26,18 @@ void main() {
   late DeliveryDestinationBloc deliveryDestinationBloc;
   late MockAddDeliveryDestination mockAddDeliveryDestination;
   late MockFetchDeliveryDestinations mockFetchDeliveryDestinations;
-  late MockFetchDeliveryDestination mockFetchDeliveryDestination;
   late MockUpdateDeliveryDestination mockUpdateDeliveryDestination;
   late MockDeleteDeliveryDestination mockDeleteDeliveryDestination;
 
   setUp(() {
     mockAddDeliveryDestination = MockAddDeliveryDestination();
     mockFetchDeliveryDestinations = MockFetchDeliveryDestinations();
-    mockFetchDeliveryDestination = MockFetchDeliveryDestination();
     mockUpdateDeliveryDestination = MockUpdateDeliveryDestination();
     mockDeleteDeliveryDestination = MockDeleteDeliveryDestination();
 
     deliveryDestinationBloc = DeliveryDestinationBloc(
       addDeliveryDestination: mockAddDeliveryDestination,
       fetchDeliveryDestinations: mockFetchDeliveryDestinations,
-      fetchDeliveryDestination: mockFetchDeliveryDestination,
       updateDeliveryDestination: mockUpdateDeliveryDestination,
       deleteDeliveryDestination: mockDeleteDeliveryDestination,
     );
@@ -134,7 +127,7 @@ void main() {
 
   group('_onFetchDeliveryDestinations', () {
     blocTest(
-      'should emit [DeliveryDestinationStatus.fetchDeliveryDestinationsError] when call is unsuccessful',
+      'should emit[DeliveryDestinationStatus.loading, DeliveryDestinationStatus.fetchDeliveryDestinationsError] when call is unsuccessful',
       setUp: () {
         when(() => mockFetchDeliveryDestinations.call()).thenAnswer(
           (_) async => Left(
@@ -151,6 +144,9 @@ void main() {
       expect:
           () => <DeliveryDestinationState>[
             DeliveryDestinationState(
+              deliveryDestinationStatus: DeliveryDestinationStatus.loading,
+            ),
+            DeliveryDestinationState(
               deliveryDestinationStatus:
                   DeliveryDestinationStatus.fetchDeliveryDestinationsError,
               message: 'Failed to fetch delivery destinations',
@@ -159,7 +155,7 @@ void main() {
     );
 
     blocTest(
-      'should emit [ DeliveryDestinationStatus.deliveryDestinationsFetched] when call is successful',
+      'should emit [DeliveryDestinationStatus.loading, DeliveryDestinationStatus.deliveryDestinationsFetched] when call is successful',
       setUp: () {
         when(
           () => mockFetchDeliveryDestinations.call(),
@@ -171,76 +167,14 @@ void main() {
               deliveryDestinationBloc.add(FetchDeliveryDestinationsEvent()),
       expect:
           () => <DeliveryDestinationState>[
+             DeliveryDestinationState(
+              deliveryDestinationStatus:
+                  DeliveryDestinationStatus.loading,
+            ),
             DeliveryDestinationState(
               deliveryDestinationStatus:
                   DeliveryDestinationStatus.deliveryDestinationsFetched,
               deliveryDestinations: [tDeliveryDestinationTwo],
-            ),
-          ],
-    );
-  });
-
-  group('_onFetchDeliveryDestination', () {
-    blocTest(
-      'should emit [DeliveryDestinationStatus.loading, DeliveryDestinationStatus.fetchDeliveryDestinationError] when call is unsuccessful',
-      setUp: () {
-        when(
-          () => mockFetchDeliveryDestination.call(
-            deliveryDestinationId: tDeliveryDestinationTwo.id!,
-          ),
-        ).thenAnswer(
-          (_) async => Left(
-            SupabaseDatabaseFailure(
-              message: 'Failed to fetch delivery destination',
-            ),
-          ),
-        );
-      },
-      build: () => deliveryDestinationBloc,
-      act:
-          (bloc) => deliveryDestinationBloc.add(
-            FetchDeliveryDestinationEvent(
-              deliveryDestinationId: tDeliveryDestinationTwo.id!,
-            ),
-          ),
-      expect:
-          () => <DeliveryDestinationState>[
-            DeliveryDestinationState(
-              deliveryDestinationStatus: DeliveryDestinationStatus.loading,
-            ),
-            DeliveryDestinationState(
-              deliveryDestinationStatus:
-                  DeliveryDestinationStatus.fetchDeliveryDestinationError,
-              message: 'Failed to fetch delivery destination',
-            ),
-          ],
-    );
-
-    blocTest(
-      'should emit [DeliveryDestinationStatus.loading, DeliveryDestinationStatus.deliveryDestinationFetched] when call is successful',
-      setUp: () {
-        when(
-          () => mockFetchDeliveryDestination.call(
-            deliveryDestinationId: tDeliveryDestinationTwo.id!,
-          ),
-        ).thenAnswer((_) async => Right(tDeliveryDestinationTwo));
-      },
-      build: () => deliveryDestinationBloc,
-      act:
-          (bloc) => deliveryDestinationBloc.add(
-            FetchDeliveryDestinationEvent(
-              deliveryDestinationId: tDeliveryDestinationTwo.id!,
-            ),
-          ),
-      expect:
-          () => <DeliveryDestinationState>[
-            DeliveryDestinationState(
-              deliveryDestinationStatus: DeliveryDestinationStatus.loading,
-            ),
-            DeliveryDestinationState(
-              deliveryDestinationStatus:
-                  DeliveryDestinationStatus.deliveryDestinationFetched,
-              deliveryDestination: tDeliveryDestinationTwo,
             ),
           ],
     );

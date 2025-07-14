@@ -20,4 +20,15 @@ final class _Env {
 
   static const String stripePublishableKey =
       'pk_test_51O4mQ6Il9L38YbmM5QXxJeZXB9WrjWnjkxZZMgfMmiAWIwzy7pWT3AaAoEG7zre2wO9BFP1W3Z7j4PBvw3cxzTrL00tCXnSZiq';
+
+  static const String redisHost =
+      'redis-13984.c326.us-east-1-3.ec2.redns.redis-cloud.com';
+
+  static const String redisPort = '13984';
+
+  static const String redisUsername = 'default';
+
+  static const String redisPassword = 'LveDxvyDKAOV0tdJVEmAfjyaEsQX6FNj';
+
+  static const String cacheKey = 'shoesData';
 }

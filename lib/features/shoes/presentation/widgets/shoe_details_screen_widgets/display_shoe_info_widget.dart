@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 import '../../../../../core/core.dart';
 import '../../../../cart/presentation/bloc/cart_bloc.dart';
 import '../../../domain/entities/shoe_entity.dart';
@@ -52,20 +53,22 @@ class _DisplayShoeInfoWidgetState extends State<DisplayShoeInfoWidget> {
   Widget build(BuildContext context) {
     return BlocListener<CartBloc, CartState>(
       listener: (context, state) {
-       if (state.cartItemsStatus == CartItemsStatus.cartItemAdded) {
-            snackBarWidget(
-              message: state.successMessage!,
-              bgColor: Theme.of(context).colorScheme.primary,
-              duration: 2, context: context,
-            );
+        if (state.cartItemsStatus == CartItemsStatus.cartItemAdded) {
+          snackBarWidget(
+            message: state.message!,
+            bgColor: Theme.of(context).colorScheme.primary,
+            duration: 2,
+            context: context,
+          );
           _delayedNavigation();
         }
         if (state.cartItemsStatus == CartItemsStatus.fetchCartItemsError) {
-            snackBarWidget(
-              message: state.errorMessage!,
-              bgColor: Theme.of(context).colorScheme.error,
-              duration: 2, context: context,
-            );
+          snackBarWidget(
+            message: state.message!,
+            bgColor: Theme.of(context).colorScheme.error,
+            duration: 2,
+            context: context,
+          );
         }
       },
       child: Padding(
@@ -87,7 +90,7 @@ class _DisplayShoeInfoWidgetState extends State<DisplayShoeInfoWidget> {
             const SizedBox(height: 8),
             sizeColorWidget(),
             const SizedBox(height: 40),
-            addToCartBuyNowWidgets(),
+            addToCartWidget(),
           ],
         ),
       ),
@@ -127,58 +130,62 @@ class _DisplayShoeInfoWidgetState extends State<DisplayShoeInfoWidget> {
   }
 
   Widget sizesButton({required int index}) {
-    return ElevatedButton(
-      style: ElevatedButton.styleFrom(
-        shape: CircleBorder(
-          side: BorderSide(
-            color: Theme.of(context).colorScheme.primary,
-            width: 1.5,
+    return Skeleton.leaf(
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          shape: CircleBorder(
+            side: BorderSide(
+              color: Theme.of(context).colorScheme.primary,
+              width: 1.5,
+            ),
           ),
-        ),
-        backgroundColor:
-            currentSizeIndex == index
-                ? Theme.of(context).colorScheme.primary
-                : Theme.of(context).colorScheme.surface,
-        surfaceTintColor:
-            currentSizeIndex == index
-                ? Theme.of(context).colorScheme.primary
-                : Theme.of(context).colorScheme.surface,
-      ),
-      onPressed: () {
-        onSizeSelected(index);
-        if (currentSizeIndex == index) {
-          shoeSize = widget.shoe.sizes[index];
-        }
-      },
-      child: Text(
-        '${widget.shoe.sizes[index]}',
-        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-          fontSize: 18,
-          color:
+          backgroundColor:
               currentSizeIndex == index
-                  ? Theme.of(context).colorScheme.surface
-                  : Theme.of(context).colorScheme.primary,
+                  ? Theme.of(context).colorScheme.primary
+                  : Theme.of(context).colorScheme.surface,
+          surfaceTintColor:
+              currentSizeIndex == index
+                  ? Theme.of(context).colorScheme.primary
+                  : Theme.of(context).colorScheme.surface,
+        ),
+        onPressed: () {
+          onSizeSelected(index);
+          if (currentSizeIndex == index) {
+            shoeSize = widget.shoe.sizes[index];
+          }
+        },
+        child: Text(
+          '${widget.shoe.sizes[index]}',
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            fontSize: 18,
+            color:
+                currentSizeIndex == index
+                    ? Theme.of(context).colorScheme.surface
+                    : Theme.of(context).colorScheme.primary,
+          ),
         ),
       ),
     );
   }
 
   Widget colorsWidget() {
-    return Container(
-      decoration: BoxDecoration(
-        border: Border.all(
-          color: Theme.of(context).colorScheme.primary,
-          width: 1,
+    return Skeleton.leaf(
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: Theme.of(context).colorScheme.primary,
+            width: 1,
+          ),
+          borderRadius: BorderRadius.circular(20),
         ),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      padding: const EdgeInsets.only(left: 2, right: 2),
-      child: Row(
-        children: [
-          Text('Color', style: Theme.of(context).textTheme.labelLarge),
-          const SizedBox(width: 10),
-          colorDropDownWidget(),
-        ],
+        padding: const EdgeInsets.only(left: 2, right: 2),
+        child: Row(
+          children: [
+            Text('Color', style: Theme.of(context).textTheme.labelLarge),
+            const SizedBox(width: 10),
+            colorDropDownWidget(),
+          ],
+        ),
       ),
     );
   }
@@ -212,53 +219,16 @@ class _DisplayShoeInfoWidgetState extends State<DisplayShoeInfoWidget> {
     );
   }
 
-  Widget addToCartBuyNowWidgets() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Container(
-          width: MediaQuery.of(context).size.width * 0.5,
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.primary,
-            borderRadius: BorderRadius.circular(5),
-          ),
-          padding: const EdgeInsets.all(1),
-          child: IconButton(
-            onPressed: () {
-              onValidate(
-                shoeTitle: widget.shoe.title,
-                shoeImage: widget.shoe.images[0],
-                shoePrice: widget.shoe.price,
-                shoeSize: shoeSize,
-                shoeColor: shoeColor,
-                quantity: quantity,
-                context: context,
-                isBuyNow: false,
-              );
-            },
-            icon: ImageIcon(
-              const AssetImage('assets/icons/add_to_cart_icon.png'),
-              size: 40,
-              color: Theme.of(context).colorScheme.surface,
-            ),
-          ),
+  Widget addToCartWidget() {
+    return Skeleton.leaf(
+      child: Container(
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.primary,
+          borderRadius: BorderRadius.circular(5),
         ),
-        ElevatedButtonWidget(
-          buttonText: 'Buy Now',
-          textColor: Theme.of(context).colorScheme.primary,
-          textFontSize: 19,
-          buttonWidth: MediaQuery.of(context).size.width * 0.4,
-          backgroundColor: Theme.of(context).colorScheme.surface,
-          surfaceTintColor: Theme.of(context).colorScheme.surface,
-          radius: 5,
-          borderSideColor: Theme.of(context).colorScheme.primary,
-          borderSideWidth: 1,
-          padding: const EdgeInsets.only(
-            top: 12,
-            bottom: 12,
-            left: 10,
-            right: 10,
-          ),
+        padding: const EdgeInsets.all(1),
+        child: IconButton(
           onPressed: () {
             onValidate(
               shoeTitle: widget.shoe.title,
@@ -268,11 +238,15 @@ class _DisplayShoeInfoWidgetState extends State<DisplayShoeInfoWidget> {
               shoeColor: shoeColor,
               quantity: quantity,
               context: context,
-              isBuyNow: true,
             );
           },
+          icon: ImageIcon(
+            const AssetImage('assets/icons/add_to_cart_icon.png'),
+            size: 40,
+            color: Theme.of(context).colorScheme.surface,
+          ),
         ),
-      ],
+      ),
     );
   }
 }

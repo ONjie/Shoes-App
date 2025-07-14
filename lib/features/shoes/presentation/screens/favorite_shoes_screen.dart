@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 import '../../../../core/core.dart';
+import '../../domain/entities/favorite_shoe_entity.dart';
 import '../bloc/shoes_bloc.dart';
 import '../widgets/favorite_shoes_screen_widgets/favorite_shoes_grid_view_widget.dart';
-
 
 class FavoriteShoesScreen extends StatefulWidget {
   const FavoriteShoesScreen({super.key});
@@ -14,6 +15,9 @@ class FavoriteShoesScreen extends StatefulWidget {
 }
 
 class _FavoriteShoesScreenState extends State<FavoriteShoesScreen> {
+  bool isLoading = true;
+
+  late List<FavoriteShoeEntity> favoriteShoes = FavoriteShoeEntity.mockFavoriteShoes;
 
   @override
   void initState() {
@@ -25,26 +29,12 @@ class _FavoriteShoesScreenState extends State<FavoriteShoesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
-      appBar: buildAppBar(),
       body: buildBody(context: context),
     );
   }
 
-  AppBar buildAppBar(){
-    return AppBar(
-      automaticallyImplyLeading: false,
-      elevation: 0,
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      surfaceTintColor: Theme.of(context).colorScheme.surface,
-      title: Text(
-        'Favorite',
-        style: Theme.of(context).textTheme.titleLarge?.copyWith(color: Theme.of(context).colorScheme.secondary),
-      ),
-      centerTitle: true,
-    );
-  }
 
-  Widget buildBody({required BuildContext context}){
+  Widget buildBody({required BuildContext context}) {
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
 
@@ -53,32 +43,40 @@ class _FavoriteShoesScreenState extends State<FavoriteShoesScreen> {
         height: screenHeight,
         width: screenWidth,
         child: Padding(
-          padding: const EdgeInsets.only(top: 16, right: 12, left: 12, bottom: 0),
-          child: BlocBuilder<ShoesBloc, ShoesState>(
-              builder: (context, state){
-
-                if(state.shoesStatus == ShoesStatus.loading){
-                  return Center(
-                    child: CircularProgressIndicator(color: Theme.of(context).colorScheme.primary,),
-                  );
-                }
-
-                if(state.shoesStatus == ShoesStatus.favoriteShoesFetched){
-                  return FavoriteShoesGridViewWidget(
-                    favoriteShoes: state.favoriteShoes!,
-                    screenHeight: screenHeight,
-                    screenWidth: screenWidth,
-                  );
-                }
-
-                if(state.shoesStatus == ShoesStatus.fetchFavoriteShoesError){
-                  return ErrorStateWidget(
-                    message: state.errorMessage!,
-                  );
-                }
-
-                return Container();
+          padding: const EdgeInsets.only(
+            top: 16,
+            right: 12,
+            left: 12,
+            bottom: 0,
+          ),
+          child: BlocConsumer<ShoesBloc, ShoesState>(
+            listener: (context, state) {
+              if (state.shoesStatus == ShoesStatus.favoriteShoesFetched) {
+      
+                setState(() {
+                  favoriteShoes = state.favoriteShoes!;
+                  isLoading = false;
+                });
               }
+            },
+            builder: (context, state) {
+              if (state.shoesStatus == ShoesStatus.fetchFavoriteShoesError) {
+                return ErrorStateWidget(message: state.errorMessage!);
+              }
+
+              return Skeletonizer(
+                enabled: isLoading,
+                enableSwitchAnimation: true,
+                effect: ShimmerEffect(
+                  baseColor: Colors.grey[300]!,
+                  highlightColor: Colors.grey[100]!,
+                  duration: Duration(seconds: 1),
+                ),
+                child: FavoriteShoesGridViewWidget(
+                  favoriteShoes: favoriteShoes,
+                ),
+              );
+            },
           ),
         ),
       ),

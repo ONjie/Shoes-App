@@ -45,7 +45,7 @@ void main() {
     shoeTitle: 'Title',
     image: 'Image1',
     color: 'Color',
-    price: 100.0,
+    price: 100.00,
     shoeSize: 14,
     quantity: 1,
   );
@@ -54,7 +54,7 @@ void main() {
     shoeTitle: 'Title',
     image: 'Image1',
     color: 'Color',
-    price: 100.0,
+    price: 100.00,
     shoeSize: 14,
     quantity: 1,
   );
@@ -62,7 +62,7 @@ void main() {
   group('_onAddCartItemToCartItems', () {
     const tInsertedId = 1;
     blocTest(
-      'should emit [ShoeCartStatus.cartItemAdded] when successful',
+      'should emit [CartItemsStatus.cartItemAdded] when successful',
       setUp: () {
         when(
           () => mockAddCartItem.call(cartItem: tCartItemOne),
@@ -77,13 +77,13 @@ void main() {
           () => [
             CartState(
               cartItemsStatus: CartItemsStatus.cartItemAdded,
-              successMessage: cartItemAddedSuccessfully,
+              message: cartItemAddedSuccessfully,
             ),
           ],
     );
 
     blocTest(
-      'should emit [ShoeCartStatus.addCartIemToCartItemsError] when unsuccessful',
+      'should emit [CartItemsStatus.addCartIemToCartItemsError] when unsuccessful',
       setUp: () {
         when(() => mockAddCartItem.call(cartItem: tCartItemOne)).thenAnswer(
           (_) async =>
@@ -99,7 +99,7 @@ void main() {
           () => [
             CartState(
               cartItemsStatus: CartItemsStatus.addCartIemToCartItemsError,
-              errorMessage: addCartItemErrorMessage,
+              message: addCartItemErrorMessage,
             ),
           ],
     );
@@ -107,7 +107,7 @@ void main() {
 
   group('_onDeleteCartItems', () {
     blocTest(
-      'should emit [ShoeCartStatus.cartItemsDeleted] when successful',
+      'should emit [CartItemsStatus.cartItemsDeleted] when successful',
       setUp: () {
         when(
           () => mockDeleteCartItems.call(),
@@ -122,7 +122,7 @@ void main() {
     );
 
     blocTest(
-      'should emit [ShoeCartStatus.deleteCartItemsError] when unsuccessful',
+      'should emit [CartItemsStatus.deleteCartItemsError] when unsuccessful',
       setUp: () {
         when(() => mockDeleteCartItems.call()).thenAnswer(
           (_) async => Left(
@@ -136,7 +136,7 @@ void main() {
           () => [
             CartState(
               cartItemsStatus: CartItemsStatus.deleteCartItemsError,
-              errorMessage: deleteAllCartItemsErrorMessage,
+              message: deleteAllCartItemsErrorMessage,
             ),
           ],
     );
@@ -144,7 +144,7 @@ void main() {
 
   group('_onDeleteCartItem', () {
     blocTest(
-      'should emit [ShoeCartStatus.cartItemDeleted] when successful',
+      'should emit [CartItemsStatus.cartItemDeleted] when successful',
       setUp: () {
         when(
           () => mockDeleteCartItem.call(cartItemId: any(named: 'cartItemId')),
@@ -160,7 +160,7 @@ void main() {
     );
 
     blocTest(
-      'should emit [ShoeCartStatus.deleteCartItemError] when unsuccessful',
+      'should emit [CartItemsStatus.deleteCartItemError] when unsuccessful',
       setUp: () {
         when(
           () => mockDeleteCartItem.call(cartItemId: any(named: 'cartItemId')),
@@ -176,7 +176,7 @@ void main() {
           () => [
             CartState(
               cartItemsStatus: CartItemsStatus.deleteCartItemError,
-              errorMessage: deleteCartItemErrorMessage,
+              message: deleteCartItemErrorMessage,
             ),
           ],
     );
@@ -184,7 +184,7 @@ void main() {
 
   group('_onFetchCartItems', () {
     blocTest(
-      'should emit [ShoeCartStatus.loading, ShoeCartStatus.cartItemsLoaded] when successful',
+      'should emit [CartItemsStatus.loading, CartItemsStatus.cartItemsLoaded] when successful',
       setUp: () {
         when(
           () => mockFetchCartItems.call(),
@@ -194,19 +194,19 @@ void main() {
       act: (bloc) => bloc.add(FetchCartItemsEvent()),
       expect:
           () => [
-            const CartState(cartItemsStatus: CartItemsStatus.loading),
+            CartState(cartItemsStatus: CartItemsStatus.loading),
             const CartState(
-              cartItemsStatus: CartItemsStatus.cartItemsLoaded,
+              cartItemsStatus: CartItemsStatus.cartItemsFetched,
               cartItems: [tCartItemTwo],
               totalShoesPrice: 100,
               totalCost: 120,
-              deliveryCharge: 20,
+              numberOfItems: 1,
             ),
           ],
     );
 
     blocTest(
-      'should emit [ShoeCartStatus.loading, ShoeCartStatus.fetchCartItemsError] when unsuccessful',
+      'should emit [CartItemsStatus.loading ,CartItemsStatus.fetchCartItemsError] when unsuccessful',
       setUp: () {
         when(() => mockFetchCartItems.call()).thenAnswer(
           (_) async => Left(
@@ -218,10 +218,10 @@ void main() {
       act: (bloc) => bloc.add(FetchCartItemsEvent()),
       expect:
           () => [
-            const CartState(cartItemsStatus: CartItemsStatus.loading),
+            CartState(cartItemsStatus: CartItemsStatus.loading),
             CartState(
               cartItemsStatus: CartItemsStatus.fetchCartItemsError,
-              errorMessage: fetchAllCartItemsErrorMessage,
+              message: fetchAllCartItemsErrorMessage,
             ),
           ],
     );
@@ -230,7 +230,7 @@ void main() {
   group('_onUpdateCartItemQuantity', () {
     const tQuantity = 1;
     blocTest(
-      'should emit [ShoeCartStatus.cartItemQuantityUpdated] when successful',
+      'should emit [CartItemsStatus.cartItemQuantityUpdated] when successful',
       setUp: () {
         when(
           () => mockUpdateCartItemQuantity.call(
@@ -256,7 +256,7 @@ void main() {
     );
 
     blocTest(
-      'should emit [ShoeCartStatus.updateCartItemQuantityError] when unsuccessful',
+      'should emit [CartItemsStatus.updateCartItemQuantityError] when unsuccessful',
       setUp: () {
         when(
           () => mockUpdateCartItemQuantity.call(
@@ -281,7 +281,7 @@ void main() {
           () => [
             CartState(
               cartItemsStatus: CartItemsStatus.updateCartItemQuantityError,
-              errorMessage: updateCartItemQuantityErrorMessage,
+              message: updateCartItemQuantityErrorMessage,
             ),
           ],
     );

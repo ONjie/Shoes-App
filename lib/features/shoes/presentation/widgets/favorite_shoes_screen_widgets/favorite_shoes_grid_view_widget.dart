@@ -7,13 +7,10 @@ class FavoriteShoesGridViewWidget extends StatelessWidget {
   const FavoriteShoesGridViewWidget({
     super.key,
     required this.favoriteShoes,
-    required this.screenHeight,
-    required this.screenWidth,
   });
 
   final List<FavoriteShoeEntity> favoriteShoes;
-  final double screenHeight;
-  final double screenWidth;
+ 
 
   @override
   Widget build(BuildContext context) {
@@ -24,13 +21,13 @@ class FavoriteShoesGridViewWidget extends StatelessWidget {
         scrollDirection: Axis.vertical,
         itemCount: favoriteShoes.length,
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            crossAxisSpacing: 2,
-            mainAxisSpacing: 4,
-            childAspectRatio: screenWidth / (screenHeight / 1.4),
+          crossAxisCount: 2,
+          crossAxisSpacing: 10,
+          mainAxisSpacing: 10,
+          childAspectRatio: 3 / 5,
         ),
-        itemBuilder: (context, index){
-          return FavoriteShoeCard(favoriteShoe: favoriteShoes[index],);
+        itemBuilder: (context, index) {
+          return FavoriteShoeCard(favoriteShoe: favoriteShoes[index]);
         },
       ),
     );

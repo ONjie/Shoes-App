@@ -5,13 +5,16 @@ import 'package:shoes_app/core/network/network_info.dart';
 import 'package:shoes_app/core/utils/text/error_messages.dart';
 import 'package:shoes_app/features/authentication/data/datasources/remote%20data/supabase_auth_service.dart';
 import 'package:shoes_app/features/authentication/domain/repositories/authentication_repository.dart';
+import 'package:shoes_app/features/user/data/data_sources/remote_data/user_remote_database_service.dart';
 
 class AuthenticationRepositoryImpl implements AuthenticationRepository {
   final SupabaseAuthService supabaseAuthService;
   final NetworkInfo networkInfo;
+  final UserRemoteDatabaseService userRemoteDatabaseService;
   AuthenticationRepositoryImpl({
     required this.supabaseAuthService,
     required this.networkInfo,
+    required this.userRemoteDatabaseService,
   });
   @override
   Future<BoolOrFailure> checkAuthState() async {
@@ -85,7 +88,7 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
         email: email,
         password: password,
       );
-      await supabaseAuthService.createAccount(
+      await userRemoteDatabaseService.createUserAccount(
         email: email,
         username: username,
         userId: userId,
@@ -95,6 +98,8 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
       return Left(SupabaseAuthFailure(message: e.message));
     } on OtherExceptions catch (e) {
       return Left(OtherFailure(message: e.message));
+    } on SupabaseDatabaseException catch (e) {
+      return Left(SupabaseDatabaseFailure(message: e.message));
     }
   }
 

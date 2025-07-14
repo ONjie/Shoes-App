@@ -93,7 +93,6 @@ class ShoesRepositoryImpl implements ShoesRepository {
 
       return Right(addedShoe);
     } catch (e) {
-      print('e: ${e.toString()}');
       return Left(OtherFailure(message: e.toString()));
     }
   }

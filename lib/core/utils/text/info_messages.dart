@@ -8,3 +8,4 @@ String otpCodeSentText = 'OTP Code sent! Check your email.';
 String resetPasswordText = 'Reset Password';
 String cartItemAddedSuccessfully = 'Shoe added to cart successfully';
 String paymentSuccessfulMessage = 'Payment Successful';
+String orderCreatedMessage = 'Your order has been placed successfully.';

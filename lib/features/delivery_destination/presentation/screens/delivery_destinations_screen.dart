@@ -29,7 +29,6 @@ class _DeliveryDestinationsScreenState
   @override
   void initState() {
     currentIndex = -1;
-
     BlocProvider.of<DeliveryDestinationBloc>(
       context,
     ).add(FetchDeliveryDestinationsEvent());
@@ -102,38 +101,45 @@ class _DeliveryDestinationsScreenState
           height: screenHeight,
           child: Padding(
             padding: EdgeInsets.fromLTRB(12, 25, 12, 0),
-            child:
-                BlocConsumer<DeliveryDestinationBloc, DeliveryDestinationState>(
-                  builder: (context, state) {
-                    if (state.deliveryDestinationStatus ==
-                        DeliveryDestinationStatus
-                            .fetchDeliveryDestinationsError) {
-                      return ErrorStateWidget(message: state.message!);
-                    }
-                     if (state.deliveryDestinationStatus ==
-                        DeliveryDestinationStatus
-                            .deleteDeliveryDestinationError) {
-                      return ErrorStateWidget(message: state.message!);
-                    }
-                    return displayDeliveryDestinations();
-                  },
-                  listener: (context, state) {
-                    if (state.deliveryDestinationStatus ==
-                        DeliveryDestinationStatus.deliveryDestinationsFetched) {
-                      setState(() {
-                        deliveryDestinations = state.deliveryDestinations!;
-                        isLoading = false;
-                      });
-                    }
+            child: BlocConsumer<
+              DeliveryDestinationBloc,
+              DeliveryDestinationState
+            >(
+              builder: (context, state) {
+                if (state.deliveryDestinationStatus ==
+                    DeliveryDestinationStatus.fetchDeliveryDestinationsError) {
+                  return ErrorStateWidget(message: state.message!);
+                }
+                if (state.deliveryDestinationStatus ==
+                    DeliveryDestinationStatus.deleteDeliveryDestinationError) {
+                  return ErrorStateWidget(message: state.message!);
+                }
+                return displayDeliveryDestinations();
+              },
+              listener: (context, state) {
+                if (state.deliveryDestinationStatus ==
+                    DeliveryDestinationStatus.loading) {
+                  setState(() {
+                    isLoading = true;
+                  });
+                }
 
-                    if (state.deliveryDestinationStatus ==
-                        DeliveryDestinationStatus.deliveryDestinationDeleted) {
-                      BlocProvider.of<DeliveryDestinationBloc>(
-                        context,
-                      ).add(FetchDeliveryDestinationsEvent());
-                    }
-                  },
-                ),
+                if (state.deliveryDestinationStatus ==
+                    DeliveryDestinationStatus.deliveryDestinationsFetched) {
+                  setState(() {
+                    deliveryDestinations = state.deliveryDestinations!;
+                    isLoading = false;
+                  });
+                }
+
+                if (state.deliveryDestinationStatus ==
+                    DeliveryDestinationStatus.deliveryDestinationDeleted) {
+                  BlocProvider.of<DeliveryDestinationBloc>(
+                    context,
+                  ).add(FetchDeliveryDestinationsEvent());
+                }
+              },
+            ),
           ),
         ),
       ),
@@ -170,7 +176,7 @@ class _DeliveryDestinationsScreenState
               (a, b) => a.createdAt!.compareTo(b.createdAt!),
             );
             final deliveryDestination = deliveryDestinations[index];
-            return GestureDetector(
+            return InkWell(
               onTap: () {
                 onDeliveryDestinationCardSelection(index);
               },

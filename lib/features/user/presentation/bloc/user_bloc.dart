@@ -22,6 +22,12 @@ class UserBloc extends Bloc<UserEvent, UserState> {
 
   _onFetchUser(FetchUserEvent event, Emitter<UserState> emit) async {
 
+    emit(
+          UserState(
+            userStatus: UserStatus.loading
+          ),
+        );
+
     final userOrFailure = await fetchUser.call();
 
     userOrFailure.fold(

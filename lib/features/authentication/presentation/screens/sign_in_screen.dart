@@ -64,7 +64,7 @@ class _SignInScreenState extends State<SignInScreen> {
                 children: [
                   const SignInScreenMessageWidget(),
                   const SizedBox(height: 40),
-                  const SignInScreenFormWidget(),
+                   SignInScreenFormWidget(),
                   SizedBox(height: MediaQuery.of(context).size.height / 3),
                   signUpScreenLinkWidget(context: context),
                 ],

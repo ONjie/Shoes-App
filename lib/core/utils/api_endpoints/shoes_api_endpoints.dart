@@ -1,4 +1,4 @@
-const baseUrl = 'https://shoe-app-api.onrender.com/api/v1/shoes';
+const baseUrl = 'https://shoes-api-gl98.onrender.com/api/v1/shoes';
 const fetchShoesByCategoryEndpoint = '$baseUrl/fetch_shoes_by_category';
 const fetchLatestShoesEndpoint = '$baseUrl/fetch_latest_shoes';
 const fetchLatestShoesByBrandEndpoint = '$baseUrl/fetch_latest_shoes_by_brand';

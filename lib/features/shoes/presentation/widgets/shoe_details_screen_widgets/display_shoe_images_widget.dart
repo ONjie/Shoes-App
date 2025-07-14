@@ -1,5 +1,6 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 import '../../../../../core/core.dart';
 
@@ -62,26 +63,28 @@ class _DisplayShoeImagesWidgetState extends State<DisplayShoeImagesWidget> {
   }
 
   Widget shoeImagesButtons({required int index}) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(
-          color:
-              currentImageIndex == index
-                  ? Theme.of(context).colorScheme.primary
-                  : Theme.of(context).colorScheme.tertiary,
+    return Skeleton.leaf(
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(
+            color:
+                currentImageIndex == index
+                    ? Theme.of(context).colorScheme.primary
+                    : Theme.of(context).colorScheme.tertiary,
+          ),
         ),
-      ),
-      width: 60,
-      height: 60,
-      child: ShoeImageWidget(
-        imageUrl: widget.imagesUrls[index],
         width: 60,
         height: 60,
-        topRightRadius: 10,
-        topLeftRadius: 10,
-        bottomRightRadius: 10,
-        bottomLeftRadius: 10,
+        child: ShoeImageWidget(
+          imageUrl: widget.imagesUrls[index],
+          width: 60,
+          height: 60,
+          topRightRadius: 10,
+          topLeftRadius: 10,
+          bottomRightRadius: 10,
+          bottomLeftRadius: 10,
+        ),
       ),
     );
   }

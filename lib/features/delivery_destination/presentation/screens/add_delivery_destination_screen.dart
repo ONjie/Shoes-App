@@ -248,6 +248,7 @@ class _AddDeliveryDestinationScreenState
                 name: name,
                 contactNumber: '$countryCode $contactNumber',
                 googlePlusCode: googlePlusCode,
+                createdAt: DateTime.now(),
               ),
             ),
           );

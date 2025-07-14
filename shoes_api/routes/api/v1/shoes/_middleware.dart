@@ -1,20 +1,18 @@
 import 'package:dart_frog/dart_frog.dart';
-import 'package:shoes_api/env/env.dart';
-import 'package:shoes_api/src/shoes/data_sources/remote_data/supabase_database.dart';
+import 'package:redis/redis.dart';
+import 'package:shoes_api/src/shoes/data_sources/remote_data/redis_cache_service.dart';
 import 'package:shoes_api/src/shoes/repositories/shoes_repository.dart';
-import 'package:supabase/supabase.dart';
 
-final _supabaseClient = SupabaseClient(
-  Env.supabaseUrl,
-  Env.supabaseKey,
-);
-final _supabaseDatabase = SupabaseDatabaseImpl(supabaseClient: _supabaseClient);
+
+final _redisCacheServiceImpl =
+    RedisCacheServiceImpl(connection: RedisConnection());
 final _shoesRepository = ShoesRepositoryImpl(
-  supabaseDatabase: _supabaseDatabase,
+  redisService: _redisCacheServiceImpl,
 );
 
 Handler middleware(Handler handler) {
-  return handler
-      .use(provider<ShoesRepository>((_) => _shoesRepository))
-      .use(provider<SupabaseDatabase>((_) => _supabaseDatabase));
+  _redisCacheServiceImpl.init();
+  return handler.use(provider<ShoesRepository>((_) => _shoesRepository)).use(
+    provider<RedisCacheService>((_) => _redisCacheServiceImpl),
+  );
 }

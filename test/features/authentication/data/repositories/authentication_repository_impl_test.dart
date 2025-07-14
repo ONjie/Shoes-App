@@ -7,8 +7,12 @@ import 'package:shoes_app/core/network/network_info.dart';
 import 'package:shoes_app/core/utils/text/error_messages.dart';
 import 'package:shoes_app/features/authentication/data/datasources/remote%20data/supabase_auth_service.dart';
 import 'package:shoes_app/features/authentication/data/repositories/authentication_repository_impl.dart';
+import 'package:shoes_app/features/user/data/data_sources/remote_data/user_remote_database_service.dart';
 
 class MockSupabaseAuthService extends Mock implements SupabaseAuthService {}
+
+class MockUserRemoteDatabaseService extends Mock
+    implements UserRemoteDatabaseService {}
 
 class MockNetworkInfo extends Mock implements NetworkInfo {}
 
@@ -16,21 +20,24 @@ void main() {
   late AuthenticationRepositoryImpl authenticationRepositoryImpl;
   late MockSupabaseAuthService mockSupabaseAuthService;
   late MockNetworkInfo mockNetworkInfo;
+  late MockUserRemoteDatabaseService mockUserRemoteDatabaseService;
 
   setUp(() {
     mockNetworkInfo = MockNetworkInfo();
     mockSupabaseAuthService = MockSupabaseAuthService();
+    mockUserRemoteDatabaseService = MockUserRemoteDatabaseService();
     authenticationRepositoryImpl = AuthenticationRepositoryImpl(
       supabaseAuthService: mockSupabaseAuthService,
       networkInfo: mockNetworkInfo,
+      userRemoteDatabaseService: mockUserRemoteDatabaseService,
     );
   });
 
   const tUsername = 'user';
-  const tEmail = 'user@example.com';
-  const tPassword = 'password123';
-  const tUserId = 'user123';
-  const tNewPassword = 'newPassword123';
+  const tEmail = 'email';
+  const tPassword = 'password';
+  const tUserId = 'userId';
+  const tNewPassword = 'newPassword';
   const tOTPToken = '123456';
 
   void runOnlineTest(Function body) {
@@ -394,7 +401,7 @@ void main() {
           ),
         ).thenAnswer((_) async => tUserId);
         when(
-          () => mockSupabaseAuthService.createAccount(
+          () => mockUserRemoteDatabaseService.createUserAccount(
             username: any(named: 'username'),
             email: any(named: 'email'),
             userId: any(named: 'userId'),
@@ -419,7 +426,7 @@ void main() {
           ),
         ).called(1);
         verify(
-          () => mockSupabaseAuthService.createAccount(
+          () => mockUserRemoteDatabaseService.createUserAccount(
             username: any(named: 'username'),
             email: any(named: 'email'),
             userId: any(named: 'userId'),
@@ -666,20 +673,22 @@ void main() {
 
         //act
         final result = await authenticationRepositoryImpl.resetPassword(
-            email: tEmail,
-            otp: tOTPToken,
-            newPassword: tNewPassword,
-          );
+          email: tEmail,
+          otp: tOTPToken,
+          newPassword: tNewPassword,
+        );
 
         //assert
         expect(result, isA<Right<Failure, bool>>());
         expect(result.right, equals(true));
         verify(() => mockNetworkInfo.isConnected).called(1);
         verify(
-          () => mockSupabaseAuthService.verifyOTP(email: tEmail, otp: tOTPToken),
+          () =>
+              mockSupabaseAuthService.verifyOTP(email: tEmail, otp: tOTPToken),
         ).called(1);
         verify(
-          () => mockSupabaseAuthService.updatePassword(newPassword: tNewPassword),
+          () =>
+              mockSupabaseAuthService.updatePassword(newPassword: tNewPassword),
         ).called(1);
         verifyNoMoreInteractions(mockSupabaseAuthService);
         verifyNoMoreInteractions(mockNetworkInfo);
@@ -689,10 +698,11 @@ void main() {
         () async {
           //arrange
           when(
-          () =>
-              mockSupabaseAuthService.verifyOTP(email: tEmail, otp: tOTPToken),
-        ).thenThrow(SupabaseAuthException(message: 'Error'));
-
+            () => mockSupabaseAuthService.verifyOTP(
+              email: tEmail,
+              otp: tOTPToken,
+            ),
+          ).thenThrow(SupabaseAuthException(message: 'Error'));
 
           //act
           final result = await authenticationRepositoryImpl.resetPassword(
@@ -706,22 +716,26 @@ void main() {
           expect(result.left, equals(SupabaseAuthFailure(message: 'Error')));
           verify(() => mockNetworkInfo.isConnected).called(1);
           verify(
-            () => mockSupabaseAuthService.verifyOTP(email: tEmail, otp: tOTPToken)
+            () => mockSupabaseAuthService.verifyOTP(
+              email: tEmail,
+              otp: tOTPToken,
+            ),
           ).called(1);
           verifyNoMoreInteractions(mockSupabaseAuthService);
           verifyNoMoreInteractions(mockNetworkInfo);
         },
       );
 
-     test(
+      test(
         'should return Left(OtherFailure) when OtherExceptions is thrown',
         () async {
-           //arrange
+          //arrange
           when(
-          () =>
-              mockSupabaseAuthService.verifyOTP(email: tEmail, otp: tOTPToken),
-        ).thenThrow(OtherExceptions(message: 'Error'));
-
+            () => mockSupabaseAuthService.verifyOTP(
+              email: tEmail,
+              otp: tOTPToken,
+            ),
+          ).thenThrow(OtherExceptions(message: 'Error'));
 
           //act
           final result = await authenticationRepositoryImpl.resetPassword(
@@ -729,13 +743,16 @@ void main() {
             otp: tOTPToken,
             newPassword: tNewPassword,
           );
-          
+
           //assert
           expect(result, isA<Left<Failure, bool>>());
           expect(result.left, equals(OtherFailure(message: 'Error')));
           verify(() => mockNetworkInfo.isConnected).called(1);
           verify(
-            () => mockSupabaseAuthService.verifyOTP(email: tEmail, otp: tOTPToken)
+            () => mockSupabaseAuthService.verifyOTP(
+              email: tEmail,
+              otp: tOTPToken,
+            ),
           ).called(1);
           verifyNoMoreInteractions(mockSupabaseAuthService);
           verifyNoMoreInteractions(mockNetworkInfo);

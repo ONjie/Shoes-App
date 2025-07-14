@@ -30,10 +30,12 @@ class UserRemoteDatabaseServiceImpl implements UserRemoteDatabaseService {
   }) async {
     try {
       await supabaseClient.from('accounts').insert({
-        'id': userId,
+        'id': supabaseClient.auth.currentUser!.id,
         'username': username,
         'email': email,
         'profile_picture': '',
+        'created_at': DateTime.now().toIso8601String(),
+        'updated_at': DateTime.now().toIso8601String(),
       });
     } catch (e) {
       throw SupabaseDatabaseException(message: e.toString());

@@ -42,7 +42,7 @@ class CartBloc extends Bloc<CartEvent, CartState> {
         emit(
           CartState(
             cartItemsStatus: CartItemsStatus.addCartIemToCartItemsError,
-            errorMessage: failure.message,
+            message: failure.message,
           ),
         );
       },
@@ -50,7 +50,7 @@ class CartBloc extends Bloc<CartEvent, CartState> {
         emit(
           CartState(
             cartItemsStatus: CartItemsStatus.cartItemAdded,
-            successMessage: cartItemAddedSuccessfully,
+            message: cartItemAddedSuccessfully,
           ),
         );
       },
@@ -68,7 +68,7 @@ class CartBloc extends Bloc<CartEvent, CartState> {
         emit(
           CartState(
             cartItemsStatus: CartItemsStatus.deleteCartItemsError,
-            errorMessage: failure.message,
+            message: failure.message,
           ),
         );
       },
@@ -90,7 +90,7 @@ class CartBloc extends Bloc<CartEvent, CartState> {
         emit(
           CartState(
             cartItemsStatus: CartItemsStatus.deleteCartItemError,
-            errorMessage: failure.message,
+            message: failure.message,
           ),
         );
       },
@@ -101,12 +101,11 @@ class CartBloc extends Bloc<CartEvent, CartState> {
   }
 
   _onFetchCartItems(FetchCartItemsEvent event, Emitter<CartState> emit) async {
-    late double totalShoesPrice = 0;
-    late double totalCost = 0;
-    const double deliveryCharge = 20;
+    late double totalShoesPrice = 0.00;
+    late double totalCost = 0.00;
     late int numberOfItems = 0;
 
-    emit(const CartState(cartItemsStatus: CartItemsStatus.loading));
+    emit(CartState(cartItemsStatus: CartItemsStatus.loading));
 
     final cartItemsOrFailure = await fetchCartItems.call();
 
@@ -115,7 +114,7 @@ class CartBloc extends Bloc<CartEvent, CartState> {
         emit(
           CartState(
             cartItemsStatus: CartItemsStatus.fetchCartItemsError,
-            errorMessage: failure.message,
+            message: failure.message,
           ),
         );
       },
@@ -125,14 +124,14 @@ class CartBloc extends Bloc<CartEvent, CartState> {
           numberOfItems += (item.quantity);
         }
         totalCost = totalShoesPrice + deliveryCharge;
+
         emit(
           CartState(
-            cartItemsStatus: CartItemsStatus.cartItemsLoaded,
+            cartItemsStatus: CartItemsStatus.cartItemsFetched,
             cartItems: cartItems,
             totalShoesPrice: totalShoesPrice,
             totalCost: totalCost,
-            deliveryCharge: deliveryCharge,
-            numberOfItems: numberOfItems
+            numberOfItems: numberOfItems,
           ),
         );
       },
@@ -153,7 +152,7 @@ class CartBloc extends Bloc<CartEvent, CartState> {
         emit(
           CartState(
             cartItemsStatus: CartItemsStatus.updateCartItemQuantityError,
-            errorMessage: failure.message,
+            message: failure.message,
           ),
         );
       },

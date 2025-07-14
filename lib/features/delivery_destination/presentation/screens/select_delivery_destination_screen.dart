@@ -28,7 +28,7 @@ class SelectDeliveryDestinationScreen extends StatefulWidget {
 
 class _SelectDeliveryDestinationScreenState
     extends State<SelectDeliveryDestinationScreen> {
-  bool isLoading = true;
+  bool isLoading = false;
   late List<DeliveryDestinationEntity> deliveryDestinations =
       DeliveryDestinationEntity.mockDeliveryDestinations;
 
@@ -37,12 +37,18 @@ class _SelectDeliveryDestinationScreenState
   @override
   void initState() {
     currentIndex = -1;
-
+    isLoading = true;
     BlocProvider.of<DeliveryDestinationBloc>(
       context,
     ).add(FetchDeliveryDestinationsEvent());
 
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    isLoading = false;
+    super.dispose();
   }
 
   void onDeliveryDestinationCardSelection(int index) {
@@ -120,6 +126,12 @@ class _SelectDeliveryDestinationScreenState
                     return displayDeliveryDestinations();
                   },
                   listener: (context, state) {
+                    if (state.deliveryDestinationStatus ==
+                        DeliveryDestinationStatus.deliveryDestinationsFetched) {
+                      setState(() {
+                        isLoading = true;
+                      });
+                    }
                     if (state.deliveryDestinationStatus ==
                         DeliveryDestinationStatus.deliveryDestinationsFetched) {
                       setState(() {

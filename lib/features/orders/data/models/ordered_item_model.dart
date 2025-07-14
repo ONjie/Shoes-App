@@ -25,7 +25,7 @@ class OrderedItemModel extends Equatable {
     title: json['title'] as String,
     image: json['image'] as String,
     color: json['color'] as String,
-    price: json['price'] as double,
+    price: (json['price'] as num).toDouble(),
     size: json['size'] as int,
     quantity: json['quantity'] as int,
   );

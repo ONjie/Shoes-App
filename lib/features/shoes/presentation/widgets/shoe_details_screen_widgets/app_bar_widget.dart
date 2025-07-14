@@ -6,12 +6,13 @@ AppBar appBarWidget({
   required String shoeTitle,
   required bool isFavorite,
   required BuildContext context,
+  required bool isLoading,
 }) {
   return AppBar(
     automaticallyImplyLeading: false,
     elevation: 0,
-    backgroundColor: Theme.of(context).colorScheme.primary,
-    surfaceTintColor: Theme.of(context).colorScheme.primary,
+    backgroundColor: isLoading ? Theme.of(context).colorScheme.surface : Theme.of(context).colorScheme.primary,
+    surfaceTintColor: isLoading ? Theme.of(context).colorScheme.surface : Theme.of(context).colorScheme.primary,
     leading: IconButton(
       onPressed: () {
         context.go('/home/0');

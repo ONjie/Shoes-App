@@ -5,8 +5,6 @@ import '../../../../../core/core.dart';
 import '../../../../cart/domain/entities/cart_item_entity.dart';
 import '../../../../cart/presentation/bloc/cart_bloc.dart';
 
-const deliveryCharge = 20;
-
 onValidate({
   required String shoeTitle,
   required String shoeImage,
@@ -15,7 +13,6 @@ onValidate({
   required String shoeColor,
   required int quantity,
   required BuildContext context,
-  required bool isBuyNow,
 }) {
   if (shoeSize == 0 && shoeColor.isNotEmpty) {
     snackBarWidget(
@@ -39,19 +36,17 @@ onValidate({
       context: context,
     );
   } else {
-    !isBuyNow
-        ? BlocProvider.of<CartBloc>(context).add(
-          AddCartItemToCartItemsEvent(
-            cartItem: CartItemEntity(
-              shoeTitle: shoeTitle,
-              image: shoeImage,
-              color: shoeColor,
-              price: shoePrice,
-              shoeSize: shoeSize,
-              quantity: quantity,
-            ),
-          ),
-        )
-        : null;
+    BlocProvider.of<CartBloc>(context).add(
+      AddCartItemToCartItemsEvent(
+        cartItem: CartItemEntity(
+          shoeTitle: shoeTitle,
+          image: shoeImage,
+          color: shoeColor,
+          price: shoePrice,
+          shoeSize: shoeSize,
+          quantity: quantity,
+        ),
+      ),
+    );
   }
 }

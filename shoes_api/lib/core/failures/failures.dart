@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-abstract class Failure extends Equatable{
+abstract class Failure extends Equatable {
   const Failure({required this.message});
   final String message;
 
@@ -14,4 +14,8 @@ class SupabaseFailure extends Failure {
 
 class OtherFailure extends Failure {
   const OtherFailure({required super.message});
+}
+
+class RedisCacheFailure extends Failure {
+  const RedisCacheFailure({required super.message});
 }

@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shoes_app/core/core.dart';
 import 'package:shoes_app/features/delivery_destination/domain/use_cases/add_delivery_destination.dart';
 import 'package:shoes_app/features/delivery_destination/domain/use_cases/delete_delivery_destination.dart';
-import 'package:shoes_app/features/delivery_destination/domain/use_cases/fetch_delivery_destination.dart';
 import 'package:shoes_app/features/delivery_destination/domain/use_cases/update_delivery_destination.dart';
 
 import '../../domain/entities/delivery_destination_entity.dart';
@@ -15,14 +14,12 @@ part 'delivery_destination_state.dart';
 class DeliveryDestinationBloc
     extends Bloc<DeliveryDestinationEvent, DeliveryDestinationState> {
   final AddDeliveryDestination addDeliveryDestination;
-  final FetchDeliveryDestination fetchDeliveryDestination;
   final FetchDeliveryDestinations fetchDeliveryDestinations;
   final UpdateDeliveryDestination updateDeliveryDestination;
   final DeleteDeliveryDestination deleteDeliveryDestination;
   DeliveryDestinationBloc({
     required this.addDeliveryDestination,
     required this.fetchDeliveryDestinations,
-    required this.fetchDeliveryDestination,
     required this.updateDeliveryDestination,
     required this.deleteDeliveryDestination,
   }) : super(
@@ -32,7 +29,6 @@ class DeliveryDestinationBloc
        ) {
     on<AddDeliveryDestinationEvent>(_onAddDeliveryDestination);
     on<FetchDeliveryDestinationsEvent>(_onFetchDeliveryDestinations);
-    on<FetchDeliveryDestinationEvent>(_onFetchDeliveryDestination);
     on<UpdateDeliveryDestinationEvent>(_onUpdateDeliveryDestination);
     on<DeleteDeliveryDestinationEvent>(_onDeleteDeliveryDestination);
   }
@@ -76,10 +72,14 @@ class DeliveryDestinationBloc
     FetchDeliveryDestinationsEvent event,
     Emitter<DeliveryDestinationState> emit,
   ) async {
-  
+    emit(
+      DeliveryDestinationState(
+        deliveryDestinationStatus: DeliveryDestinationStatus.loading,
+      ),
+    );
 
     final deliveryDestinationsOrFailure =
-          await fetchDeliveryDestinations.call();
+        await fetchDeliveryDestinations.call();
 
     deliveryDestinationsOrFailure.fold(
       (failure) {
@@ -97,42 +97,6 @@ class DeliveryDestinationBloc
             deliveryDestinationStatus:
                 DeliveryDestinationStatus.deliveryDestinationsFetched,
             deliveryDestinations: deliveryDestinations,
-          ),
-        );
-      },
-    );
-  }
-
-  _onFetchDeliveryDestination(
-    FetchDeliveryDestinationEvent event,
-    Emitter<DeliveryDestinationState> emit,
-  ) async {
-    emit(
-      DeliveryDestinationState(
-        deliveryDestinationStatus: DeliveryDestinationStatus.loading,
-      ),
-    );
-
-    final deliveryDestinationOrFailure = await fetchDeliveryDestination.call(
-      deliveryDestinationId: event.deliveryDestinationId,
-    );
-
-    deliveryDestinationOrFailure.fold(
-      (failure) {
-        emit(
-          DeliveryDestinationState(
-            deliveryDestinationStatus:
-                DeliveryDestinationStatus.fetchDeliveryDestinationError,
-            message: mapFailureToMessage(failure: failure),
-          ),
-        );
-      },
-      (deliveryDestination) {
-        emit(
-          DeliveryDestinationState(
-            deliveryDestinationStatus:
-                DeliveryDestinationStatus.deliveryDestinationFetched,
-            deliveryDestination: deliveryDestination,
           ),
         );
       },

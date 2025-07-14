@@ -1,19 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shoes_app/features/shoes/domain/entities/brand_entity.dart';
 import '../../bloc/shoes_bloc.dart';
 
 class ShoesBrandsWidget extends StatefulWidget {
-  const ShoesBrandsWidget({
-    super.key,
-    required this.currentIndex,
-    required this.brandsList,
-    required this.brandsImagesList,
-  });
+  const ShoesBrandsWidget({super.key, required this.currentIndex});
 
   final int currentIndex;
-  final List<String> brandsList;
-  final List<String> brandsImagesList;
 
   @override
   State<ShoesBrandsWidget> createState() => _ShoesBrandsWidgetState();
@@ -21,6 +15,8 @@ class ShoesBrandsWidget extends StatefulWidget {
 
 class _ShoesBrandsWidgetState extends State<ShoesBrandsWidget> {
   late int index = widget.currentIndex;
+
+  final List<BrandEntity> brands = BrandEntity.brands;
 
   @override
   Widget build(BuildContext context) {
@@ -60,7 +56,7 @@ class _ShoesBrandsWidgetState extends State<ShoesBrandsWidget> {
       child: ListView.separated(
         shrinkWrap: true,
         scrollDirection: Axis.horizontal,
-        itemCount: widget.brandsList.length,
+        itemCount: brands.length,
         padding: const EdgeInsets.only(top: 10, bottom: 10),
         itemBuilder: (context, buttonIndex) {
           return buildBrandLogoButton(buttonIndex: buttonIndex);
@@ -72,15 +68,13 @@ class _ShoesBrandsWidgetState extends State<ShoesBrandsWidget> {
   }
 
   Widget buildBrandLogoButton({required int buttonIndex}) {
-    return GestureDetector(
+    return InkWell(
       onTap: () {
         setState(() {
           index = buttonIndex;
         });
         BlocProvider.of<ShoesBloc>(context).add(
-          FetchShoesByBrandWithFilterEvent(
-            brand: widget.brandsList[buttonIndex],
-          ),
+          FetchShoesByBrandWithFilterEvent(brand: brands[buttonIndex].brand),
         );
       },
       child: Container(
@@ -103,7 +97,7 @@ class _ShoesBrandsWidgetState extends State<ShoesBrandsWidget> {
                       ),
                       padding: const EdgeInsets.all(1),
                       child: Image.asset(
-                        'assets/icons/${widget.brandsImagesList[buttonIndex]}',
+                        brands[buttonIndex].logo,
                         color: Theme.of(context).colorScheme.secondary,
                         height: 50,
                         width: 50,
@@ -111,7 +105,7 @@ class _ShoesBrandsWidgetState extends State<ShoesBrandsWidget> {
                     ),
                     const SizedBox(width: 5),
                     Text(
-                      widget.brandsList[buttonIndex],
+                      brands[buttonIndex].brand,
                       style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                         color: Theme.of(context).colorScheme.surface,
                       ),
@@ -119,7 +113,7 @@ class _ShoesBrandsWidgetState extends State<ShoesBrandsWidget> {
                   ],
                 )
                 : Image.asset(
-                  'assets/icons/${widget.brandsImagesList[buttonIndex]}',
+                  brands[buttonIndex].logo,
                   color: Theme.of(context).colorScheme.secondary,
                   height: 63,
                   width: 63,

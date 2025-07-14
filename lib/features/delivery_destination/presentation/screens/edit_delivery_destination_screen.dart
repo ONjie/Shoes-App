@@ -227,6 +227,7 @@ class _EditDeliveryDestinationScreenState
                 name: name,
                 contactNumber: contactNumber,
                 googlePlusCode: googlePlusCode,
+                createdAt: widget.deliveryDestination.createdAt
               ),
             ),
           );

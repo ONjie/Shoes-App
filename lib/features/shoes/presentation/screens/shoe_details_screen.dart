@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shoes_app/features/shoes/domain/entities/shoe_entity.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 import '../../../../core/core.dart';
 import '../bloc/shoes_bloc.dart';
@@ -17,6 +19,8 @@ class ShoeDetailsScreen extends StatefulWidget {
 }
 
 class _ShoeDetailsScreenState extends State<ShoeDetailsScreen> {
+  bool isLoading = true;
+  late ShoeEntity shoe = ShoeEntity.mockShoes[0];
   @override
   void initState() {
     BlocProvider.of<ShoesBloc>(
@@ -35,48 +39,45 @@ class _ShoeDetailsScreenState extends State<ShoeDetailsScreen> {
         }
         context.go('/home/0');
       },
-      child: BlocBuilder<ShoesBloc, ShoesState>(
-        builder: (context, state) {
-          if (state.shoesStatus == ShoesStatus.loading) {
-            return Container(
-              width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.height,
-              color: Theme.of(context).colorScheme.surface,
-              child: Center(
-                child: CircularProgressIndicator(color: Theme.of(context).colorScheme.primary),
-              ),
-            );
-          }
-
+      child: BlocConsumer<ShoesBloc, ShoesState>(
+        listener: (context, state) {
           if (state.shoesStatus == ShoesStatus.shoeFetched) {
-            return Scaffold(
-              backgroundColor: Theme.of(context).colorScheme.surface,
-              appBar: appBarWidget(
-                shoeTitle: state.shoe!.title,
-                isFavorite: state.shoe!.isFavorite,
-                context: context,
-              ),
-              body: BodyWidget(shoe: state.shoe!,),
-            );
+            setState(() {
+              shoe = state.shoe!;
+              isLoading = false;
+            });
           }
-
+        },
+        builder: (context, state) {
           if (state.shoesStatus == ShoesStatus.fetchShoeError) {
             return SizedBox(
               width: MediaQuery.of(context).size.width,
               height: MediaQuery.of(context).size.height,
               child: Container(
                 color: Theme.of(context).colorScheme.surface,
-                child: ErrorStateWidget(
-                  message: state.errorMessage!,
-                ),
+                child: ErrorStateWidget(message: state.errorMessage!),
               ),
             );
           }
 
-          return SizedBox(
-            width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height,
-            child: Container(color: Theme.of(context).colorScheme.surface),
+          return Skeletonizer(
+            enabled: isLoading,
+            enableSwitchAnimation: true,
+            effect: ShimmerEffect(
+              baseColor: Colors.grey[300]!,
+              highlightColor: Colors.grey[100]!,
+              duration: Duration(seconds: 1),
+            ),
+            child: Scaffold(
+              backgroundColor: Theme.of(context).colorScheme.surface,
+              appBar: appBarWidget(
+                shoeTitle: shoe.title,
+                isFavorite: shoe.isFavorite,
+                context: context,
+                isLoading: isLoading,
+              ),
+              body: BodyWidget(shoe: shoe),
+            ),
           );
         },
       ),

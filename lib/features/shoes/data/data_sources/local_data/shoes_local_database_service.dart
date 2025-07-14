@@ -30,7 +30,6 @@ class ShoesLocalDatabaseServiceImpl implements ShoesLocalDatabaseService {
             ),
           );
     } catch (e) {
-      print('error: ${e.toString()}');
       throw LocalDatabaseException(message: e.toString());
     }
   }

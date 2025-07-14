@@ -1,7 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-class CartItemEntity extends Equatable{
-
+class CartItemEntity extends Equatable {
   const CartItemEntity({
     this.id,
     required this.shoeTitle,
@@ -29,5 +28,32 @@ class CartItemEntity extends Equatable{
     price,
     shoeSize,
     quantity,
+  ];
+
+  static final mockCartItems = [
+    CartItemEntity(
+      shoeTitle: 'shoeTitle',
+      image: 'image',
+      color: 'ffffff',
+      price: 100.00,
+      shoeSize: 10,
+      quantity: 1,
+    ),
+    CartItemEntity(
+      shoeTitle: 'shoeTitle',
+      image: 'image',
+      color: 'ffffff',
+      price: 100.00,
+      shoeSize: 10,
+      quantity: 1,
+    ),
+    CartItemEntity(
+      shoeTitle: 'shoeTitle',
+      image: 'image',
+      color: 'ffffff',
+      price: 100.00,
+      shoeSize: 10,
+      quantity: 1,
+    ),
   ];
 }

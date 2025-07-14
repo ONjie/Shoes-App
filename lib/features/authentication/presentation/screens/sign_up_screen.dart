@@ -74,7 +74,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       listener: (context, state) {
         if (state.authenticationStatus == AuthenticationStatus.signUpSuccess) {
           Navigator.pop(context);
-          context.go('/home');
+          context.go('/sign_in');
         }
       },
       child: SafeArea(
@@ -90,7 +90,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   const SignUpScreenMessageWidget(),
                   const SizedBox(height: 30),
                   const SignUpScreenFormWidget(),
-                  SizedBox(height: MediaQuery.of(context).size.height / 4),
+                  SizedBox(height: MediaQuery.of(context).size.height / 3.3),
                   signInScreenLinkWidget(context: context),
                 ],
               ),

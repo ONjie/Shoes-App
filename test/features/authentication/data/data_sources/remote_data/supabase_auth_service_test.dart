@@ -30,9 +30,7 @@ void main() {
   late MockAuthResponse mockAuthResponse;
   late MockUser mockUser;
   late MockUserResponse mockUserResponse;
-  // late MockSupabaseQueryBuilder mockSupabaseQueryBuilder;
-  // late MockPostgrestFilterBuilder mockPostgrestFilterBuilder;
-
+  
   setUp(() {
     mockSupabaseClient = MockSupabaseClient();
     mockSession = MockSession();
@@ -40,14 +38,11 @@ void main() {
     mockAuthResponse = MockAuthResponse();
     mockUser = MockUser();
     mockUserResponse = MockUserResponse();
-    // mockSupabaseQueryBuilder = MockSupabaseQueryBuilder();
-    //mockPostgrestFilterBuilder = MockPostgrestFilterBuilder();
     supabaseAuthService = SupabaseAuthServiceImpl(
       supabaseClient: mockSupabaseClient,
     );
   });
 
-  // const tUsername = 'user';
   const tEmail = "user@example.com";
   const tPassword = "password123";
   const tNewPassword = 'newPassword123';
@@ -579,38 +574,4 @@ void main() {
       verifyNoMoreInteractions(mockGoTrueClient);
     });
   });
-
-  //TODO: To be implemented later
-  /*group('createAccount', () {
-    test('should create user account successfulluy', () async {
-      //arrange
-      when(
-        () => mockSupabaseClient.from('account'),
-      ).thenAnswer((_) => mockSupabaseQueryBuilder);
-      when(
-        () => mockSupabaseQueryBuilder.insert({
-          'email': tEmail,
-          'username': tUsername,
-          'profile_picture': '',
-        }),
-      ).thenAnswer((_) => mockPostgrestFilterBuilder);
-
-      //act
-      await supabaseAuthService.createAccount(
-        username: tUsername,
-        email: tEmail,
-      );
-
-      verify(() => mockSupabaseClient.from('account')).called(1);
-      verify(
-        () =>
-            mockSupabaseQueryBuilder..insert({
-              'email': any(named: 'email'),
-              'username': any(named: 'username'),
-              'profile_picture': any(named: 'profile_picture'),
-            }),
-      ).called(1);
-      //verify(() => mockPostgrestFilterBuilder).called(1);
-    });
-  });*/
 }

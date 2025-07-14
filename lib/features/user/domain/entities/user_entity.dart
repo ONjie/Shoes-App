@@ -15,4 +15,10 @@ class UserEntity extends Equatable {
 
   @override
   List<Object?> get props => [userId, username, email, profilePicture];
+
+  static final mockUser = UserEntity(
+    username: 'username',
+    email: 'email',
+    profilePicture: '',
+  );
 }

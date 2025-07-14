@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shoes_app/features/shoes/domain/entities/brand_entity.dart';
 
 class BrandsScreen extends StatefulWidget {
   const BrandsScreen({super.key});
@@ -10,14 +11,7 @@ class BrandsScreen extends StatefulWidget {
 }
 
 class _BrandsScreenState extends State<BrandsScreen> {
-  final List<String> brandsList = ['Nike', 'Adidas', 'Puma', 'Reebok'];
-
-  final brandLogoList = [
-    'nike_logo.png',
-    'adidas_logo.png',
-    'puma_logo.png',
-    'reebok_logo.png',
-  ];
+  final List<BrandEntity> brands = BrandEntity.brands;
 
   @override
   Widget build(BuildContext context) {
@@ -67,20 +61,16 @@ class _BrandsScreenState extends State<BrandsScreen> {
         width: screenWidth,
         child: Padding(
           padding: const EdgeInsets.only(top: 16, left: 12, right: 12),
-          child: brandsListView(),
+          child: ListView.separated(
+            itemCount: brands.length,
+            itemBuilder: (context, index) {
+              return Column(children: [brandsListTile(index: index)]);
+            },
+            separatorBuilder:
+                (BuildContext context, index) => const SizedBox(height: 8),
+          ),
         ),
       ),
-    );
-  }
-
-  Widget brandsListView() {
-    return ListView.separated(
-      itemCount: brandsList.length,
-      itemBuilder: (context, index) {
-        return Column(children: [brandsListTile(index: index)]);
-      },
-      separatorBuilder:
-          (BuildContext context, index) => const SizedBox(height: 8),
     );
   }
 
@@ -89,16 +79,16 @@ class _BrandsScreenState extends State<BrandsScreen> {
       tileColor: Theme.of(context).colorScheme.surface,
       contentPadding: const EdgeInsets.all(0),
       onTap: () {
-        context.go('/shoes_by_brand/${brandsList[index]}');
+        context.go('/shoes_by_brand/${brands[index].brand}');
       },
       leading: Image.asset(
-        'assets/icons/${brandLogoList[index]}',
+        brands[index].logo,
         width: 40,
         height: 40,
         color: Theme.of(context).colorScheme.secondary,
       ),
       title: Text(
-        brandsList[index],
+        brands[index].brand,
         style: Theme.of(
           context,
         ).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600),

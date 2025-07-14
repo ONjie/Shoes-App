@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 
 class ShoeTitleAndPriceWidget extends StatelessWidget {
@@ -13,17 +14,19 @@ class ShoeTitleAndPriceWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 170,
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.primary,
-        borderRadius: const BorderRadius.only(
-            bottomLeft: Radius.circular(15), bottomRight: Radius.circular(15)),
-      ),
-
-      child: Padding(
-        padding: const EdgeInsets.only(top: 8, right: 8, left: 8, bottom: 2),
-        child: buildShoeTitleAndPriceWidget(context: context),
+    return Skeleton.leaf(
+      child: Container(
+        width: 170,
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.primary,
+          borderRadius: const BorderRadius.only(
+              bottomLeft: Radius.circular(15), bottomRight: Radius.circular(15)),
+        ),
+      
+        child: Padding(
+          padding: const EdgeInsets.only(top: 8, right: 8, left: 8, bottom: 2),
+          child: buildShoeTitleAndPriceWidget(context: context),
+        ),
       ),
     );
   }

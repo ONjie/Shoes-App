@@ -16,9 +16,13 @@ import 'package:shoes_app/features/user/presentation/screens/edit_profile_screen
 
 import '../../features/authentication/presentation/screens/change_password_screen.dart';
 import '../../features/authentication/presentation/screens/forgot_password_screen.dart';
+import '../../features/authentication/presentation/widgets/splash_screen_widget/splash_screen_error_widget.dart';
 import '../../features/checkout/presentation/screens/checkout_screen.dart';
 import '../../features/delivery_destination/presentation/screens/delivery_destinations_screen.dart';
 import '../../features/delivery_destination/presentation/screens/select_delivery_destination_screen.dart';
+import '../../features/orders/presentation/screens/order_details_screen.dart';
+import '../../features/orders/presentation/screens/orders_history_screen.dart';
+import '../../onboarding_screen.dart';
 
 final router = GoRouter(
   initialLocation: '/',
@@ -27,6 +31,19 @@ final router = GoRouter(
       name: 'Splash Screen',
       path: '/',
       builder: (context, state) => SplashScreen(),
+    ),
+    GoRoute(
+      name: 'Splash Screen Error Widget',
+      path: '/splash_screen_error_widget/:message',
+      builder: (context, state) {
+        final message = state.pathParameters['message'];
+        return SplashScreenErrorWidget(message: message!,);
+      },
+    ),
+    GoRoute(
+      name: 'Onboarding Screen',
+      path: '/onboarding',
+      builder: (context, state) => OnboardingScreen(),
     ),
     GoRoute(
       name: 'Home Screen',
@@ -140,8 +157,23 @@ final router = GoRouter(
         return CheckoutScreen(
           cartItems: cartItems,
           totalCost: totalCost,
-          deliveryDestination: deliveryDestination
+          deliveryDestination: deliveryDestination,
         );
+      },
+    ),
+    GoRoute(
+      name: 'Orders History Screen',
+      path: '/orders_history',
+      builder: (context, state) {
+        return OrdersHistoryScreen();
+      },
+    ),
+    GoRoute(
+      name: 'Order Details Screen',
+      path: '/order_details/:orderId',
+      builder: (context, state) {
+        final orderId = state.pathParameters['orderId'];
+        return OrderDetailsScreen(orderId: int.parse(orderId!));
       },
     ),
   ],

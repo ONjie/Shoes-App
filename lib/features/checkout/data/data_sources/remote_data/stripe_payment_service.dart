@@ -60,7 +60,6 @@ class StripePaymentServiceImpl implements StripePaymentService {
 
       return true;
     } catch (e) {
-      print('error: ${e.toString()}');
       throw StripePaymentException(message: e.toString());
     }
   }

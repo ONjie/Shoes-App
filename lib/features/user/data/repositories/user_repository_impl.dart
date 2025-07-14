@@ -29,7 +29,6 @@ class UserRepositoryImpl implements UserRepository {
 
     try {
       final result = await userRemoteDatabaseService.fetchUser();
-
       return Right(result.toUserEntity());
     } on SupabaseDatabaseException catch (e) {
       return Left(SupabaseDatabaseFailure(message: e.message));

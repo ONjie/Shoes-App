@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shoes_app/features/shoes/domain/entities/shoe_entity.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 import '../../../../core/core.dart';
 import '../bloc/shoes_bloc.dart';
@@ -18,6 +20,10 @@ class _ShoesByBrandScreenState extends State<ShoesByBrandScreen> {
   late String category = '';
 
   final categories = ['All', 'Men', 'Women', 'Kid'];
+
+  late List<ShoeEntity> shoes = ShoeEntity.mockShoes;
+
+  bool isLoading = true;
 
   @override
   void initState() {
@@ -83,9 +89,13 @@ class _ShoesByBrandScreenState extends State<ShoesByBrandScreen> {
         dividerColor: Theme.of(context).colorScheme.primary,
         indicatorColor: Theme.of(context).colorScheme.secondary,
         labelColor: Theme.of(context).colorScheme.secondary,
-        labelStyle: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 18),
+        labelStyle: Theme.of(
+          context,
+        ).textTheme.titleMedium?.copyWith(fontSize: 18),
         unselectedLabelColor: Theme.of(context).colorScheme.surface,
-        unselectedLabelStyle: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 18),
+        unselectedLabelStyle: Theme.of(
+          context,
+        ).textTheme.titleMedium?.copyWith(fontSize: 18),
         tabs: [Text('All'), Text('Men'), Text('Women'), Text('Kid')],
       ),
     );
@@ -101,32 +111,29 @@ class _ShoesByBrandScreenState extends State<ShoesByBrandScreen> {
         width: screenWidth,
         child: Padding(
           padding: const EdgeInsets.fromLTRB(12, 10, 12, 0),
-          child: BlocBuilder<ShoesBloc, ShoesState>(
-            builder: (context, state) {
+          child: BlocConsumer<ShoesBloc, ShoesState>(
+            listener: (context, state) {
               if (state.shoesStatus == ShoesStatus.loading) {
-                return Center(
-                  child: CircularProgressIndicator(
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                );
+                setState(() {
+                  shoes = ShoeEntity.mockShoes;
+                  isLoading = true;
+                });
               }
-
               if (state.shoesStatus == ShoesStatus.shoesByBrandFetched) {
-                return ShoesGridViewWidget(
-                  shoes: state.shoesByBrand!,
-                  screenHeight: screenHeight,
-                  screenWidth: screenWidth,
-                );
+                setState(() {
+                  shoes = state.shoesByBrand!;
+                  isLoading = false;
+                });
               }
 
               if (state.shoesStatus == ShoesStatus.shoesByCategoryFetched) {
-                return ShoesGridViewWidget(
-                  shoes: state.shoesByCategory!,
-                  screenHeight: screenHeight,
-                  screenWidth: screenWidth,
-                );
+                setState(() {
+                  shoes = state.shoesByCategory!;
+                  isLoading = false;
+                });
               }
-
+            },
+            builder: (context, state) {
               if (state.shoesStatus == ShoesStatus.fetchShoesByBrandError) {
                 return ErrorStateWidget(message: state.errorMessage!);
               }
@@ -135,7 +142,16 @@ class _ShoesByBrandScreenState extends State<ShoesByBrandScreen> {
                 return ErrorStateWidget(message: state.errorMessage!);
               }
 
-              return Container();
+              return Skeletonizer(
+                enabled: isLoading,
+                enableSwitchAnimation: true,
+                effect: ShimmerEffect(
+                  baseColor: Colors.grey[300]!,
+                  highlightColor: Colors.grey[100]!,
+                  duration: Duration(seconds: 1),
+                ),
+                child: ShoesGridViewWidget(shoes: shoes),
+              );
             },
           ),
         ),

@@ -137,7 +137,6 @@ class _ResetPasswordFormWidgetState extends State<ResetPasswordFormWidget> {
         obscureText: !_obscureText,
         obscuringCharacter: '*',
         keyboardType: TextInputType.text,
-        textCapitalization: TextCapitalization.words,
         style: Theme.of(context).textTheme.bodyLarge,
         decoration: textFormFieldDecorationWidget(
           borderRadius: 12,
@@ -193,7 +192,6 @@ class _ResetPasswordFormWidgetState extends State<ResetPasswordFormWidget> {
         obscureText: !_obscureTextTwo,
         obscuringCharacter: '*',
         keyboardType: TextInputType.text,
-        textCapitalization: TextCapitalization.words,
         style: Theme.of(context).textTheme.bodyLarge,
         decoration: textFormFieldDecorationWidget(
           borderRadius: 12,

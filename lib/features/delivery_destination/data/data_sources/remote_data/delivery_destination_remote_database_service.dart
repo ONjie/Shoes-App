@@ -15,10 +15,6 @@ abstract class DeliveryDestinationRemoteDatabaseService {
   });
 
   Future<void> deleteDeliveryDestination({required int deliveryDestinationId});
-
-  Future<DeliveryDestinationModel> fetchDeliveryDestination({
-    required int deliveryDestinationId,
-  });
 }
 
 class DeliveryDestinationRemoteDatabaseServiceImpl
@@ -41,7 +37,7 @@ class DeliveryDestinationRemoteDatabaseServiceImpl
         'name': deliveryDestination.name,
         'contact_number': deliveryDestination.contactNumber,
         'google_plus_code': deliveryDestination.googlePlusCode,
-        'created_at': DateTime.now().toIso8601String(),
+        'created_at': deliveryDestination.createdAt?.toIso8601String(),
         'updated_at': DateTime.now().toIso8601String(),
       });
     } catch (e) {
@@ -61,27 +57,6 @@ class DeliveryDestinationRemoteDatabaseServiceImpl
           .delete()
           .filter('user_id', 'eq', userId)
           .eq('id', deliveryDestinationId);
-    } catch (e) {
-      throw SupabaseDatabaseException(message: e.toString());
-    }
-  }
-
-  @override
-  Future<DeliveryDestinationModel> fetchDeliveryDestination({
-    required int deliveryDestinationId,
-  }) async {
-    try {
-      final userId = supabaseClient.auth.currentUser?.id;
-
-      final result =
-          await supabaseClient
-              .from('delivery_destination')
-              .select()
-              .filter('user_id', 'eq', userId)
-              .eq('id', deliveryDestinationId)
-              .single();
-
-      return DeliveryDestinationModel.fromJson(result);
     } catch (e) {
       throw SupabaseDatabaseException(message: e.toString());
     }
@@ -132,6 +107,7 @@ class DeliveryDestinationRemoteDatabaseServiceImpl
                   googlePlusCode: deliveryDestination.googlePlusCode,
                   contactNumber: deliveryDestination.contactNumber,
                   updatedAt: DateTime.now(),
+                  createdAt: deliveryDestination.createdAt
                 )
                 .toJson(),
           )

@@ -8,11 +8,6 @@ abstract class SupabaseAuthService {
   Future<bool> checkAuthState();
   Future<void> signOut();
   Future<void> sendResetPasswordOTP({required String email});
-  Future<void> createAccount({
-    required String username,
-    required String email,
-    required String userId,
-  });
   Future<void> verifyOTP({required String email, required String otp});
   Future<void> updatePassword({required String newPassword});
 }
@@ -90,28 +85,6 @@ class SupabaseAuthServiceImpl implements SupabaseAuthService {
       await supabaseClient.auth.resetPasswordForEmail(email);
     } catch (e) {
       if (e is AuthException) {
-        throw SupabaseAuthException(message: e.message);
-      } else {
-        throw OtherExceptions(message: e.toString());
-      }
-    }
-  }
-
-  @override
-  Future<void> createAccount({
-    required String username,
-    required String email,
-    required String userId,
-  }) async {
-    try {
-      await supabaseClient.from('accounts').insert({
-        'id': userId,
-        'username': username,
-        'email': email,
-        'profile_picture': '',
-      });
-    } catch (e) {
-      if (e is PostgrestException) {
         throw SupabaseAuthException(message: e.message);
       } else {
         throw OtherExceptions(message: e.toString());
