@@ -1,23 +1,38 @@
 # Shoes App
 
-A fully featured mobile ecommerce app built with Flutter where users can browse shoes by brand and category, manage their profile, add and manage their delivery destinations, and purchase securely via Stripe. Backed by a modern backend stack using Supabase, Redis, and Dart Frog.
+Shoes App is a fully featured mobile eCommerce application built using Flutter, designed to offer a seamless shopping experience for users interested in stylish footwear. The app supports dynamic product browsing, secure checkout, and personalized user management all powered by a scalable backend stack.
+
+I led the development of both the frontend and backend, focusing on clean architecture, performance, and real-time interactivity.
 
 ---
 
-## Features
+## Key Features & Functionality
 
-- Browse a wide range of shoes by category and brand
-- Select and view detailed info about shoes
-- Add shoes to cart and favorite list
-- Add, update and delete delivery destination
-- Checkout securely using Stripe
-- View orders and order history
-- Sign up, Sign in, Sign out
-- Reset password, Change password
-- Update profile picture and username
+- **Product Discovery:** Browse shoes by brand and category with intuitive filtering and responsive UI.
+- **Product Details:** View rich information including images, descriptions, sizes, and pricing.
+- **Cart & Wishlist:** Add shoes to a shopping cart or mark them as favorites for later viewing.
+- **Address Management:** Add, update, and delete multiple delivery destinations.
+- **Secure Payments:** Integrated with Stripe for smooth and secure checkout.
+- **Order Management:** Users can track current orders and review order history.
+- **User Authentication:** Implemented with Supabase Auth, supporting sign up, sign in, sign out.
+- **Account Recovery:** Forgot password and change password flows included.
+- **Profile Settings:** Edit username and upload a profile picture using Supabase Storage.
+- **Performance Optimized:** Redis used for caching and speeding up user experience.
+- **Clean Architecture:** The project follows a scalable and testable clean architecture pattern.
 
+---
+## What I Learned
+- Building and consuming REST APIs using Dart Frog
+- Managing real-time data with Supabase and caching strategies with Redis
+- Handling payment flows and integrating Stripe SDK in Flutter
+- Structuring a scalable codebase using Clean Architecture
+  
 ---
 ## Demo
+
+https://github.com/user-attachments/assets/22941de3-9ebb-429d-8b85-e0890ee3b708
+
+
 --
 
 ## Tech Stack
