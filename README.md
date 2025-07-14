@@ -17,8 +17,14 @@ A fully featured fullstack mobile ecommerce app built with Flutter where users c
 - Update profile picture and username
 
 ---
+### What I Learned
+- Building and consuming REST APIs using Dart Frog
+- Managing real-time data with Supabase and caching strategies with Redis
+- Handling payment flows and integrating Stripe SDK in Flutter
+- Structuring a scalable codebase using Clean Architecture
+  
+---
 ## Demo
-
 
 https://github.com/user-attachments/assets/22941de3-9ebb-429d-8b85-e0890ee3b708
 
