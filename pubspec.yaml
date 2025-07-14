@@ -70,7 +70,6 @@ flutter:
       - assets/icons/
       - assets/fonts/
       - assets/lottie/
-      - assets/videos/
 
   fonts: 
     - family: Caladae
