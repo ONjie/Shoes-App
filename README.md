@@ -1,6 +1,6 @@
 # Shoes App
 
-A fully featured mobile ecommerce app built with Flutter where users can browse shoes by brand and category, manage their profile, add and manage their delivery destinations, and purchase securely via Stripe. Backed by a modern backend stack using Supabase, Redis, and Dart Frog.
+A fully featured fullstack mobile ecommerce app built with Flutter where users can browse shoes by brand and category, manage their profile, add and manage their delivery destinations, and purchase securely via Stripe. Backed by a modern backend stack using Supabase, Redis, and Dart Frog.
 
 ---
 
