@@ -18,6 +18,11 @@ A fully featured mobile ecommerce app built with Flutter where users can browse 
 
 ---
 ## Demo
+
+
+https://github.com/user-attachments/assets/22941de3-9ebb-429d-8b85-e0890ee3b708
+
+
 --
 
 ## Tech Stack
